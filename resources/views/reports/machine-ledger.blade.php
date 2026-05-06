@@ -1,0 +1,8 @@
+@extends('adminlte::page')
+@section('title', 'Machine Ledger')
+@section('content_header')<h1>Machine Ledger</h1>@stop
+@section('content')
+<form class="card card-body mb-3" method="GET"><div class="form-row"><div class="col-md-3"><input type="date" name="from" class="form-control" value="{{ request('from', $from) }}"></div><div class="col-md-3"><input type="date" name="to" class="form-control" value="{{ request('to', $to) }}"></div><div class="col-md-3"><select name="machine_id" class="form-control" required><option value="">Select Machine</option>@foreach($machines as $machine)<option value="{{ $machine->id }}" @selected((int)request('machine_id', $machineId) === $machine->id)>{{ $machine->name }}</option>@endforeach</select></div><div class="col-md-3"><button class="btn btn-primary btn-block">Filter</button></div></div></form>
+<div class="mb-2"><a class="btn btn-sm btn-success" href="{{ route('reports.export', ['report' => 'machine-ledger', 'format' => 'excel'] + request()->query()) }}">Excel</a> <a class="btn btn-sm btn-danger" href="{{ route('reports.export', ['report' => 'machine-ledger', 'format' => 'pdf'] + request()->query()) }}">PDF</a></div>
+<div class="card"><div class="card-body table-responsive p-0"><table class="table table-striped"><thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Running Balance</th></tr></thead><tbody>@foreach($rows as $row)<tr><td>{{ $row['date'] }}</td><td>{{ $row['description'] }}</td><td>{{ number_format($row['debit'], 2) }}</td><td>{{ number_format($row['credit'], 2) }}</td><td>{{ number_format($row['running_balance'], 2) }}</td></tr>@endforeach</tbody></table></div></div>
+@stop

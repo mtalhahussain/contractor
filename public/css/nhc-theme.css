@@ -1,0 +1,306 @@
+/* =========================================================
+   NHC Modern Theme - logo-driven AdminLTE overrides
+   Inspired by modern dashboard patterns (Vuexy-like spacing/cards)
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    --nhc-primary: #e8820c;
+    --nhc-primary-strong: #ca6907;
+    --nhc-primary-soft: rgba(232, 130, 12, 0.14);
+    --nhc-ink: #2a231a;
+    --nhc-ink-soft: #574839;
+    --nhc-bg: #f6f5f1;
+    --nhc-surface: #ffffff;
+    --nhc-border: rgba(87, 72, 57, 0.14);
+    --nhc-shadow: 0 14px 32px rgba(35, 31, 24, 0.08);
+    --nhc-radius-xl: 18px;
+    --nhc-radius-lg: 14px;
+    --nhc-radius-md: 10px;
+}
+
+html,
+body,
+.layout-fixed .wrapper,
+.content-wrapper {
+    font-family: 'Plus Jakarta Sans', 'Source Sans Pro', sans-serif !important;
+}
+
+body {
+    background: radial-gradient(circle at 8% 5%, rgba(232, 130, 12, 0.14), transparent 42%),
+        radial-gradient(circle at 92% 0%, rgba(42, 35, 26, 0.08), transparent 38%),
+        var(--nhc-bg) !important;
+    color: var(--nhc-ink) !important;
+}
+
+.content-wrapper {
+    background: transparent !important;
+}
+
+.main-header.navbar {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-bottom: 1px solid var(--nhc-border) !important;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 18px rgba(35, 31, 24, 0.06) !important;
+}
+
+.main-sidebar {
+    background: linear-gradient(170deg, #2f281e 0%, #1f1a14 100%) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.main-sidebar .brand-link {
+    min-height: 74px;
+    border-bottom: 1px solid rgba(232, 130, 12, 0.3) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px;
+    padding: 10px 14px !important;
+    background: linear-gradient(90deg, rgba(232, 130, 12, 0.1), rgba(232, 130, 12, 0)) !important;
+}
+
+.brand-image.brand-logo-img,
+.brand-image {
+    height: 46px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    margin: 0 !important;
+    opacity: 1 !important;
+    border-radius: 8px;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.brand-text {
+    color: #fff8ef !important;
+    font-size: 0.94rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+}
+
+.sidebar-dark-orange .nav-sidebar > .nav-item {
+    margin: 4px 10px !important;
+}
+
+.sidebar-dark-orange .nav-sidebar > .nav-item > .nav-link,
+.sidebar-dark-orange .nav-treeview > .nav-item > .nav-link {
+    border-radius: 12px !important;
+    color: rgba(255, 245, 232, 0.86) !important;
+    transition: all 0.2s ease;
+}
+
+.sidebar-dark-orange .nav-sidebar > .nav-item > .nav-link:hover,
+.sidebar-dark-orange .nav-treeview > .nav-item > .nav-link:hover {
+    background: rgba(232, 130, 12, 0.16) !important;
+    color: #fff !important;
+    transform: translateX(2px);
+}
+
+.sidebar-dark-orange .nav-sidebar > .nav-item > .nav-link.active,
+.sidebar-dark-orange .nav-sidebar > .nav-item.menu-open > .nav-link,
+.sidebar-dark-orange .nav-treeview > .nav-item > .nav-link.active {
+    background: linear-gradient(90deg, var(--nhc-primary), #f1992d) !important;
+    color: #fff !important;
+    box-shadow: 0 8px 14px rgba(232, 130, 12, 0.28);
+}
+
+.sidebar-dark-orange .nav-header {
+    color: rgba(255, 213, 169, 0.72) !important;
+    letter-spacing: 0.12em;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+}
+
+.content-header h1 {
+    color: var(--nhc-ink) !important;
+    font-size: 1.45rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em;
+}
+
+.breadcrumb-item a,
+.breadcrumb-item.active {
+    color: var(--nhc-ink-soft) !important;
+}
+
+.card,
+.info-box,
+.small-box,
+.callout,
+.alert,
+.modal-content {
+    border: 1px solid var(--nhc-border) !important;
+    border-radius: var(--nhc-radius-xl) !important;
+    box-shadow: var(--nhc-shadow) !important;
+    background: var(--nhc-surface) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid var(--nhc-border) !important;
+    border-radius: var(--nhc-radius-xl) var(--nhc-radius-xl) 0 0 !important;
+    background: rgba(255, 255, 255, 0.7) !important;
+    font-weight: 600 !important;
+}
+
+.small-box .inner h3,
+.small-box .inner h4 {
+    font-weight: 700 !important;
+    letter-spacing: -0.01em;
+}
+
+.small-box.bg-primary,
+.small-box.bg-info,
+.small-box.bg-success,
+.small-box.bg-warning,
+.small-box.bg-orange,
+.small-box.bg-dark {
+    color: #fff !important;
+    border: none !important;
+    background: linear-gradient(120deg, #3b2f22 0%, var(--nhc-primary) 52%, #f2a23c 100%) !important;
+}
+
+.small-box .icon > i {
+    opacity: 0.2 !important;
+}
+
+.btn {
+    border-radius: var(--nhc-radius-md) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em;
+}
+
+.btn-primary,
+.btn-warning,
+.btn-flat.btn-primary,
+.btn-flat.btn-warning {
+    color: #fff !important;
+    border-color: transparent !important;
+    background: linear-gradient(115deg, var(--nhc-primary), #f29d33) !important;
+    box-shadow: 0 8px 16px rgba(232, 130, 12, 0.28);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-warning:hover,
+.btn-warning:focus,
+.btn-flat.btn-primary:hover,
+.btn-flat.btn-warning:hover {
+    color: #fff !important;
+    transform: translateY(-1px);
+    background: linear-gradient(115deg, var(--nhc-primary-strong), var(--nhc-primary)) !important;
+}
+
+.btn-success,
+.btn-info,
+.btn-dark,
+.btn-secondary {
+    border-color: rgba(42, 35, 26, 0.16) !important;
+}
+
+.form-control,
+.custom-select,
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    border-radius: var(--nhc-radius-md) !important;
+    border-color: rgba(87, 72, 57, 0.26) !important;
+    min-height: 42px;
+    box-shadow: none !important;
+}
+
+.form-control:focus,
+.custom-select:focus,
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: var(--nhc-primary) !important;
+    box-shadow: 0 0 0 0.2rem var(--nhc-primary-soft) !important;
+}
+
+.table {
+    border-radius: var(--nhc-radius-lg);
+    overflow: hidden;
+}
+
+.table thead th {
+    background: linear-gradient(90deg, #3a3023, #2a231a) !important;
+    color: #fff !important;
+    border-bottom: none !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.03em !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(232, 130, 12, 0.04) !important;
+}
+
+.page-item.active .page-link {
+    border-color: var(--nhc-primary) !important;
+    background: var(--nhc-primary) !important;
+}
+
+.page-link {
+    color: var(--nhc-ink-soft) !important;
+    border-radius: 8px !important;
+    margin: 0 2px;
+}
+
+.badge-primary,
+.badge-warning,
+.badge-info,
+.bg-primary {
+    background: var(--nhc-primary) !important;
+}
+
+.login-page,
+.register-page {
+    background: radial-gradient(circle at top left, rgba(232, 130, 12, 0.22), transparent 50%),
+        linear-gradient(165deg, #f6f3ee 0%, #ece7df 100%) !important;
+}
+
+.login-box .card,
+.register-box .card {
+    backdrop-filter: blur(10px);
+}
+
+.login-logo img,
+.register-logo img {
+    max-width: 220px !important;
+    height: auto !important;
+}
+
+.card-outline.card-primary,
+.card-outline.card-warning {
+    border-top: 3px solid var(--nhc-primary) !important;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #ece7df;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c99558;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--nhc-primary);
+}
+
+@media (max-width: 992px) {
+    .main-sidebar .brand-link {
+        min-height: 68px;
+    }
+
+    .brand-image.brand-logo-img,
+    .brand-image {
+        height: 40px !important;
+    }
+
+    .content-header h1 {
+        font-size: 1.2rem !important;
+    }
+}
