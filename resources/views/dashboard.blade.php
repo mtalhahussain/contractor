@@ -2,39 +2,8 @@
 
 @section('title', 'Dashboard')
 
-@section('css')
-<style>
-    /* ── Solid color overrides for AdminLTE small-box ── */
-    .small-box.bg-primary        { background: #2563eb !important; }
-    .small-box.bg-success        { background: #16a34a !important; }
-    .small-box.bg-info           { background: #0891b2 !important; }
-    .small-box.bg-warning        { background: #d97706 !important; }
-    .small-box.bg-danger         { background: #dc2626 !important; }
-
-    /* Remove any gradient on small-box inner overlay */
-    .small-box > .inner          { background: transparent !important; }
-    .small-box:hover             { filter: brightness(0.93); }
-
-    /* ── Solid color overrides for action buttons ── */
-    .btn-primary  { background-color: #2563eb !important; border-color: #2563eb !important; }
-    .btn-primary:hover  { background-color: #1d4ed8 !important; border-color: #1d4ed8 !important; }
-
-    .btn-success  { background-color: #16a34a !important; border-color: #16a34a !important; }
-    .btn-success:hover  { background-color: #15803d !important; border-color: #15803d !important; }
-
-    .btn-info     { background-color: #0891b2 !important; border-color: #0891b2 !important; color:#fff !important; }
-    .btn-info:hover     { background-color: #0e7490 !important; border-color: #0e7490 !important; }
-
-    .btn-warning  { background-color: #d97706 !important; border-color: #d97706 !important; color:#fff !important; }
-    .btn-warning:hover  { background-color: #b45309 !important; border-color: #b45309 !important; }
-
-    .btn-dark     { background-color: #1e293b !important; border-color: #1e293b !important; }
-    .btn-dark:hover     { background-color: #0f172a !important; border-color: #0f172a !important; }
-</style>
-@stop
-
 @section('content_header')
-    <h1 class="mb-0">Simple Dashboard</h1>
+    <h1 class="mb-0">Dashboard</h1>
 @stop
 
 @section('content')

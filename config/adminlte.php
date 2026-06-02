@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>NHC</b> Contractor',
+    'logo' => '',
     'logo_img' => 'images/logo.png',
     'logo_img_class' => 'brand-image brand-logo-img',
     'logo_img_xl' => null,
@@ -89,8 +89,8 @@ return [
             'path' => 'images/logo.png',
             'alt' => 'NHC Logo',
             'class' => '',
-            'width' => 160,
-            'height' => 100,
+            'width' => 250,
+            'height' => 250,
         ],
     ],
 
@@ -196,7 +196,7 @@ return [
     'classes_content_wrapper' => '',
     'classes_content_header' => '',
     'classes_content' => '',
-    'classes_sidebar' => 'sidebar-dark-orange sidebar-modern elevation-0',
+    'classes_sidebar' => 'sidebar-dark-primary sidebar-modern elevation-0',
     'classes_sidebar_nav' => 'nav-flat nav-compact',
     'classes_topnav' => 'navbar-light navbar-white',
     'classes_topnav_nav' => 'navbar-expand',

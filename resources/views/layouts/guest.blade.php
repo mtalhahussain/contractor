@@ -47,7 +47,7 @@
             }
 
             .brand-logo-ring {
-                background: rgba(255,255,255,0.07);
+                background: #eee;
                 backdrop-filter: blur(10px);
                 border: 1px solid rgba(255,255,255,0.12);
                 box-shadow: 0 8px 32px rgba(0,0,0,0.3);
@@ -138,14 +138,12 @@
                 <div style="position:relative; z-index:2; text-align:center; max-width:420px;">
 
                     {{-- Logo --}}
-                    <div class="brand-logo-ring" style="display:inline-flex; align-items:center; justify-content:center; width:110px; height:110px; border-radius:28px; margin-bottom:2rem;">
+                    <div class="brand-logo-ring" style="display:inline-flex; align-items:center; justify-content:center; border-radius:28px; margin-bottom:2rem;">
                         <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }} Logo"
-                             style="width:90px; height:90px; object-fit:contain; object-position:center; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));">
+                             style="object-fit:contain; object-position:center; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));">
                     </div>
 
-                    <h1 style="color:#ffffff; font-size:2rem; font-weight:800; letter-spacing:-0.5px; margin-bottom:0.5rem; line-height:1.2;">
-                        {{ config('app.name', 'Contractor') }}
-                    </h1>
+                  
                     <p style="color:#93c5fd; font-size:1rem; font-weight:400; margin-bottom:2.5rem; line-height:1.6;">
                         Complete contractor management &amp; tracking system
                     </p>
