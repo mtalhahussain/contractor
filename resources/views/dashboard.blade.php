@@ -48,12 +48,6 @@
                 Add Part Usage
             </a>
         </div>
-        <div class="col-6 col-md-4 col-lg-2 mb-3">
-            <a href="{{ route('reports.index') }}" class="btn btn-dark btn-lg btn-block py-4">
-                <i class="fas fa-chart-line d-block mb-2"></i>
-                View Reports
-            </a>
-        </div>
     </div>
 
     <div class="row mt-2">
