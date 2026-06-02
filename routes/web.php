@@ -5,12 +5,18 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DieselRateHistoryController;
 use App\Http\Controllers\DieselUsageEntryController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\FuelIssueController;
+use App\Http\Controllers\FuelStockController;
+use App\Http\Controllers\FuelStockMovementController;
 use App\Http\Controllers\MachineController;
 use App\Http\Controllers\MachineHourEntryController;
+use App\Http\Controllers\MachinePartUsageController;
 use App\Http\Controllers\MachineRateHistoryController;
+use App\Http\Controllers\PartStockMovementController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SparePartController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,6 +33,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('diesel-usage', DieselUsageEntryController::class);
     Route::resource('payments', PaymentController::class);
     Route::resource('expenses', ExpenseController::class);
+    Route::resource('spare-parts', SparePartController::class);
+    Route::resource('part-stock-movements', PartStockMovementController::class);
+    Route::resource('machine-part-usages', MachinePartUsageController::class);
+    Route::resource('fuel-stocks', FuelStockController::class);
+    Route::resource('fuel-stock-movements', FuelStockMovementController::class);
+    Route::resource('fuel-issues', FuelIssueController::class);
 
     Route::get('/bulk/hours', [BulkEntryController::class, 'hoursForm'])->name('bulk.hours.form');
     Route::post('/bulk/hours', [BulkEntryController::class, 'hoursStore'])->name('bulk.hours.store');
@@ -40,6 +52,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/machine-ledger', [ReportController::class, 'machineLedger'])->name('reports.machine-ledger');
     Route::get('/reports/daily-summary', [ReportController::class, 'dailySummary'])->name('reports.daily-summary');
     Route::get('/reports/monthly-summary', [ReportController::class, 'monthlySummary'])->name('reports.monthly-summary');
+    Route::get('/reports/inventory-stock', [ReportController::class, 'inventoryStock'])->name('reports.inventory-stock');
+    Route::get('/reports/part-usage', [ReportController::class, 'partUsage'])->name('reports.part-usage');
+    Route::get('/reports/machine-parts', [ReportController::class, 'machineParts'])->name('reports.machine-parts');
+    Route::get('/reports/fuel-stock', [ReportController::class, 'fuelStock'])->name('reports.fuel-stock');
+    Route::get('/reports/fuel-issues', [ReportController::class, 'fuelIssues'])->name('reports.fuel-issues');
+    Route::get('/reports/fuel-consumption', [ReportController::class, 'fuelConsumption'])->name('reports.fuel-consumption');
     Route::get('/reports/{report}/export/{format}', [ReportController::class, 'export'])->name('reports.export');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -35,4 +35,24 @@ class Machine extends Model
     {
         return $this->hasMany(DieselUsageEntry::class);
     }
+
+    public function partUsages(): HasMany
+    {
+        return $this->hasMany(MachinePartUsage::class);
+    }
+
+    public function partStockMovements(): HasMany
+    {
+        return $this->hasMany(PartStockMovement::class);
+    }
+
+    public function fuelIssues(): HasMany
+    {
+        return $this->hasMany(FuelIssue::class);
+    }
+
+    public function fuelStockMovements(): HasMany
+    {
+        return $this->hasMany(FuelStockMovement::class);
+    }
 }

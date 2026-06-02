@@ -315,6 +315,20 @@ return [
         ['text' => 'Bulk Hours', 'route' => 'bulk.hours.form', 'icon' => 'fas fa-table'],
         ['text' => 'Bulk Diesel', 'route' => 'bulk.diesel.form', 'icon' => 'fas fa-th-large'],
 
+        ['header' => 'INVENTORY'],
+        [
+            'text' => 'Inventory Management',
+            'icon' => 'fas fa-boxes',
+            'submenu' => [
+                ['text' => 'Spare Parts', 'route' => 'spare-parts.index', 'icon' => 'fas fa-cogs'],
+                ['text' => 'Stock In / Out', 'route' => 'part-stock-movements.index', 'icon' => 'fas fa-warehouse'],
+                ['text' => 'Machine Part Usage', 'route' => 'machine-part-usages.index', 'icon' => 'fas fa-tools'],
+                ['text' => 'Fuel Stocks', 'route' => 'fuel-stocks.index', 'icon' => 'fas fa-gas-pump'],
+                ['text' => 'Fuel Stock In / Out', 'route' => 'fuel-stock-movements.index', 'icon' => 'fas fa-oil-can'],
+                ['text' => 'Fuel Issues', 'route' => 'fuel-issues.index', 'icon' => 'fas fa-fill-drip'],
+            ],
+        ],
+
         ['header' => 'REPORTS'],
         ['text' => 'Reports', 'route' => 'reports.index', 'icon' => 'fas fa-chart-line'],
         ['text' => 'Machine Hours Report', 'route' => 'reports.machine-hours', 'icon' => 'fas fa-receipt'],
@@ -323,6 +337,12 @@ return [
         ['text' => 'Machine Ledger', 'route' => 'reports.machine-ledger', 'icon' => 'fas fa-book'],
         ['text' => 'Daily Summary', 'route' => 'reports.daily-summary', 'icon' => 'fas fa-calendar-day'],
         ['text' => 'Monthly Summary', 'route' => 'reports.monthly-summary', 'icon' => 'fas fa-calendar-alt'],
+        ['text' => 'Inventory Stock Report', 'route' => 'reports.inventory-stock', 'icon' => 'fas fa-boxes'],
+        ['text' => 'Part Usage Report', 'route' => 'reports.part-usage', 'icon' => 'fas fa-tools'],
+        ['text' => 'Machine-wise Consumption', 'route' => 'reports.machine-parts', 'icon' => 'fas fa-industry'],
+        ['text' => 'Fuel Stock Report', 'route' => 'reports.fuel-stock', 'icon' => 'fas fa-gas-pump'],
+        ['text' => 'Fuel Issue Report', 'route' => 'reports.fuel-issues', 'icon' => 'fas fa-oil-can'],
+        ['text' => 'Fuel Consumption Summary', 'route' => 'reports.fuel-consumption', 'icon' => 'fas fa-chart-bar'],
     ],
 
     /*

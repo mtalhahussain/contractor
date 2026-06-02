@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\DieselUsageEntry;
 use App\Models\Expense;
+use App\Models\FuelIssue;
+use App\Models\FuelStock;
 use App\Models\MachineHourEntry;
+use App\Models\MachinePartUsage;
 use App\Models\Payment;
+use App\Models\SparePart;
 use App\Services\RateResolverService;
 use Carbon\Carbon;
 use Illuminate\View\View;
@@ -56,12 +60,46 @@ class DashboardController extends Controller
 
         $monthlyBalance = $monthlyEarning - $monthlyDieselCost - $monthlyPayments - $monthlyExpenses;
 
+        $lowStockParts = SparePart::query()
+            ->whereColumn('current_stock', '<=', 'minimum_stock')
+            ->orderBy('current_stock')
+            ->limit(5)
+            ->get();
+
+        $lowStockCount = SparePart::query()
+            ->whereColumn('current_stock', '<=', 'minimum_stock')
+            ->count();
+
+        $todayPartUsage = (float) MachinePartUsage::query()
+            ->whereDate('date', $today)
+            ->sum('quantity');
+
+        $todayFuelIssue = (float) FuelIssue::query()
+            ->whereDate('date', $today)
+            ->sum('quantity');
+
+        $lowFuelStocks = FuelStock::query()
+            ->whereColumn('current_stock', '<=', 'minimum_stock')
+            ->orderBy('current_stock')
+            ->limit(5)
+            ->get();
+
+        $lowFuelCount = FuelStock::query()
+            ->whereColumn('current_stock', '<=', 'minimum_stock')
+            ->count();
+
         return view('dashboard', compact(
             'todayHours',
             'todayDiesel',
             'monthlyEarning',
             'monthlyDieselCost',
-            'monthlyBalance'
+            'monthlyBalance',
+            'lowStockParts',
+            'lowStockCount',
+            'todayPartUsage',
+            'todayFuelIssue',
+            'lowFuelStocks',
+            'lowFuelCount'
         ));
     }
 }

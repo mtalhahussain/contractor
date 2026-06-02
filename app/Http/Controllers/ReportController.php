@@ -5,9 +5,14 @@ namespace App\Http\Controllers;
 use App\Exports\ArrayExport;
 use App\Models\DieselUsageEntry;
 use App\Models\Expense;
+use App\Models\FuelIssue;
+use App\Models\FuelStock;
+use App\Models\FuelStockMovement;
 use App\Models\Machine;
 use App\Models\MachineHourEntry;
+use App\Models\MachinePartUsage;
 use App\Models\Payment;
+use App\Models\SparePart;
 use App\Services\RateResolverService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -331,6 +336,190 @@ class ReportController extends Controller
         return view('reports.monthly-summary', compact('rows', 'from', 'to'));
     }
 
+    public function inventoryStock(Request $request): View
+    {
+        $parts = SparePart::query()
+            ->when($request->boolean('low_stock_only'), fn ($query) => $query->whereColumn('current_stock', '<=', 'minimum_stock'))
+            ->orderBy('name')
+            ->get();
+
+        $rows = $parts->map(fn ($part) => [
+            'part' => $part->name,
+            'part_number' => $part->part_number,
+            'category' => $part->category,
+            'current_stock' => (float) $part->current_stock,
+            'minimum_stock' => (float) $part->minimum_stock,
+            'unit' => $part->unit,
+            'location' => $part->location,
+            'low_stock' => (float) $part->current_stock <= (float) $part->minimum_stock,
+        ]);
+
+        return view('reports.inventory-stock', [
+            'rows' => $rows,
+            'lowStockOnly' => $request->boolean('low_stock_only'),
+        ]);
+    }
+
+    public function partUsage(Request $request): View
+    {
+        [$from, $to] = $this->dateRange($request);
+
+        $entries = MachinePartUsage::query()
+            ->with(['machine', 'sparePart'])
+            ->whereBetween('date', [$from, $to])
+            ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
+            ->when($request->filled('spare_part_id'), fn ($query) => $query->where('spare_part_id', $request->spare_part_id))
+            ->when($request->filled('usage_type'), fn ($query) => $query->where('usage_type', $request->usage_type))
+            ->orderBy('date')
+            ->get();
+
+        $rows = $entries->map(fn ($entry) => [
+            'date' => $entry->date->format('Y-m-d'),
+            'machine' => $entry->machine?->name,
+            'part' => $entry->sparePart?->name,
+            'usage_type' => $entry->usage_type,
+            'quantity' => (float) $entry->quantity,
+            'reference' => $entry->reference,
+            'remarks' => $entry->remarks,
+        ]);
+
+        return view('reports.part-usage', [
+            'rows' => $rows,
+            'machines' => Machine::query()->orderBy('name')->get(),
+            'parts' => SparePart::query()->orderBy('name')->get(),
+            'from' => $from,
+            'to' => $to,
+        ]);
+    }
+
+    public function machineParts(Request $request): View
+    {
+        [$from, $to] = $this->dateRange($request);
+
+        $entries = MachinePartUsage::query()
+            ->with(['machine', 'sparePart'])
+            ->whereBetween('date', [$from, $to])
+            ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
+            ->when($request->filled('spare_part_id'), fn ($query) => $query->where('spare_part_id', $request->spare_part_id))
+            ->get()
+            ->groupBy(fn ($entry) => $entry->machine?->name.'|'.$entry->sparePart?->name)
+            ->map(function ($group) {
+                $first = $group->first();
+
+                return [
+                    'machine' => $first->machine?->name,
+                    'part' => $first->sparePart?->name,
+                    'usage_count' => $group->count(),
+                    'total_quantity' => (float) $group->sum('quantity'),
+                ];
+            })
+            ->values()
+            ->sortBy(['machine', 'part'])
+            ->values();
+
+        return view('reports.machine-parts', [
+            'rows' => $entries,
+            'machines' => Machine::query()->orderBy('name')->get(),
+            'parts' => SparePart::query()->orderBy('name')->get(),
+            'from' => $from,
+            'to' => $to,
+        ]);
+    }
+
+    public function fuelStock(Request $request): View
+    {
+        $stocks = FuelStock::query()
+            ->when($request->boolean('low_stock_only'), fn ($query) => $query->whereColumn('current_stock', '<=', 'minimum_stock'))
+            ->orderBy('name')
+            ->get();
+
+        $rows = $stocks->map(fn ($stock) => [
+            'stock' => $stock->name,
+            'code' => $stock->code,
+            'current_stock' => (float) $stock->current_stock,
+            'minimum_stock' => (float) $stock->minimum_stock,
+            'unit' => $stock->unit,
+            'location' => $stock->location,
+            'low_stock' => (float) $stock->current_stock <= (float) $stock->minimum_stock,
+        ]);
+
+        return view('reports.fuel-stock', [
+            'rows' => $rows,
+            'lowStockOnly' => $request->boolean('low_stock_only'),
+        ]);
+    }
+
+    public function fuelIssues(Request $request): View
+    {
+        [$from, $to] = $this->dateRange($request);
+
+        $entries = FuelIssue::query()
+            ->with(['fuelStock', 'machine'])
+            ->whereBetween('date', [$from, $to])
+            ->when($request->filled('fuel_stock_id'), fn ($query) => $query->where('fuel_stock_id', $request->fuel_stock_id))
+            ->when($request->filled('consumer_type'), fn ($query) => $query->where('consumer_type', $request->consumer_type))
+            ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
+            ->orderBy('date')
+            ->get();
+
+        $rows = $entries->map(fn ($entry) => [
+            'date' => $entry->date->format('Y-m-d'),
+            'stock' => $entry->fuelStock?->name,
+            'consumer_type' => $entry->consumer_type,
+            'consumer' => $entry->machine?->name ?: $entry->consumer_name,
+            'quantity' => (float) $entry->quantity,
+            'reference' => $entry->reference,
+            'remarks' => $entry->remarks,
+        ]);
+
+        return view('reports.fuel-issues', [
+            'rows' => $rows,
+            'stocks' => FuelStock::query()->orderBy('name')->get(),
+            'machines' => Machine::query()->orderBy('name')->get(),
+            'from' => $from,
+            'to' => $to,
+        ]);
+    }
+
+    public function fuelConsumption(Request $request): View
+    {
+        [$from, $to] = $this->dateRange($request);
+
+        $rows = FuelIssue::query()
+            ->with('machine')
+            ->whereBetween('date', [$from, $to])
+            ->when($request->filled('consumer_type'), fn ($query) => $query->where('consumer_type', $request->consumer_type))
+            ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
+            ->get()
+            ->groupBy(function ($issue) {
+                if ($issue->consumer_type === 'machine') {
+                    return 'machine|'.($issue->machine?->name ?: 'Unknown Machine');
+                }
+
+                return $issue->consumer_type.'|'.($issue->consumer_name ?: 'Unknown');
+            })
+            ->map(function ($group, $key) {
+                [$consumerType, $consumer] = explode('|', $key, 2);
+
+                return [
+                    'consumer_type' => $consumerType,
+                    'consumer' => $consumer,
+                    'issues_count' => $group->count(),
+                    'total_quantity' => (float) $group->sum('quantity'),
+                ];
+            })
+            ->values()
+            ->sortBy(['consumer_type', 'consumer'])
+            ->values();
+
+        return view('reports.fuel-consumption', [
+            'rows' => $rows,
+            'machines' => Machine::query()->orderBy('name')->get(),
+            'from' => $from,
+            'to' => $to,
+        ]);
+    }
+
     public function export(Request $request, string $report, string $format, RateResolverService $rateResolver): Response|BinaryFileResponse
     {
         $data = match ($report) {
@@ -340,6 +529,12 @@ class ReportController extends Controller
             'machine-ledger' => $this->machineLedgerData($request, $rateResolver),
             'daily-summary' => $this->dailySummaryData($request, $rateResolver),
             'monthly-summary' => $this->monthlySummaryData($request, $rateResolver),
+            'inventory-stock' => $this->inventoryStockData($request),
+            'part-usage' => $this->partUsageData($request),
+            'machine-parts' => $this->machinePartsData($request),
+            'fuel-stock' => $this->fuelStockData($request),
+            'fuel-issues' => $this->fuelIssuesData($request),
+            'fuel-consumption' => $this->fuelConsumptionData($request),
             default => collect(),
         };
 
@@ -541,5 +736,142 @@ class ReportController extends Controller
         }
 
         return $rows->values()->sortBy('month')->values();
+    }
+
+    private function inventoryStockData(Request $request): Collection
+    {
+        return SparePart::query()
+            ->when($request->boolean('low_stock_only'), fn ($query) => $query->whereColumn('current_stock', '<=', 'minimum_stock'))
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($part) => [
+                'part' => $part->name,
+                'part_number' => $part->part_number,
+                'category' => $part->category,
+                'current_stock' => (float) $part->current_stock,
+                'minimum_stock' => (float) $part->minimum_stock,
+                'unit' => $part->unit,
+                'location' => $part->location,
+            ]);
+    }
+
+    private function partUsageData(Request $request): Collection
+    {
+        [$from, $to] = $this->dateRange($request);
+
+        return MachinePartUsage::query()
+            ->with(['machine', 'sparePart'])
+            ->whereBetween('date', [$from, $to])
+            ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
+            ->when($request->filled('spare_part_id'), fn ($query) => $query->where('spare_part_id', $request->spare_part_id))
+            ->when($request->filled('usage_type'), fn ($query) => $query->where('usage_type', $request->usage_type))
+            ->orderBy('date')
+            ->get()
+            ->map(fn ($entry) => [
+                'date' => $entry->date->format('Y-m-d'),
+                'machine' => $entry->machine?->name,
+                'part' => $entry->sparePart?->name,
+                'usage_type' => $entry->usage_type,
+                'quantity' => (float) $entry->quantity,
+                'reference' => $entry->reference,
+                'remarks' => $entry->remarks,
+            ]);
+    }
+
+    private function machinePartsData(Request $request): Collection
+    {
+        [$from, $to] = $this->dateRange($request);
+
+        return MachinePartUsage::query()
+            ->with(['machine', 'sparePart'])
+            ->whereBetween('date', [$from, $to])
+            ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
+            ->when($request->filled('spare_part_id'), fn ($query) => $query->where('spare_part_id', $request->spare_part_id))
+            ->get()
+            ->groupBy(fn ($entry) => $entry->machine?->name.'|'.$entry->sparePart?->name)
+            ->map(function ($group) {
+                $first = $group->first();
+
+                return [
+                    'machine' => $first->machine?->name,
+                    'part' => $first->sparePart?->name,
+                    'usage_count' => $group->count(),
+                    'total_quantity' => (float) $group->sum('quantity'),
+                ];
+            })
+            ->values()
+            ->sortBy(['machine', 'part'])
+            ->values();
+    }
+
+    private function fuelStockData(Request $request): Collection
+    {
+        return FuelStock::query()
+            ->when($request->boolean('low_stock_only'), fn ($query) => $query->whereColumn('current_stock', '<=', 'minimum_stock'))
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($stock) => [
+                'stock' => $stock->name,
+                'code' => $stock->code,
+                'current_stock' => (float) $stock->current_stock,
+                'minimum_stock' => (float) $stock->minimum_stock,
+                'unit' => $stock->unit,
+                'location' => $stock->location,
+            ]);
+    }
+
+    private function fuelIssuesData(Request $request): Collection
+    {
+        [$from, $to] = $this->dateRange($request);
+
+        return FuelIssue::query()
+            ->with(['fuelStock', 'machine'])
+            ->whereBetween('date', [$from, $to])
+            ->when($request->filled('fuel_stock_id'), fn ($query) => $query->where('fuel_stock_id', $request->fuel_stock_id))
+            ->when($request->filled('consumer_type'), fn ($query) => $query->where('consumer_type', $request->consumer_type))
+            ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
+            ->orderBy('date')
+            ->get()
+            ->map(fn ($entry) => [
+                'date' => $entry->date->format('Y-m-d'),
+                'stock' => $entry->fuelStock?->name,
+                'consumer_type' => $entry->consumer_type,
+                'consumer' => $entry->machine?->name ?: $entry->consumer_name,
+                'quantity' => (float) $entry->quantity,
+                'reference' => $entry->reference,
+                'remarks' => $entry->remarks,
+            ]);
+    }
+
+    private function fuelConsumptionData(Request $request): Collection
+    {
+        [$from, $to] = $this->dateRange($request);
+
+        return FuelIssue::query()
+            ->with('machine')
+            ->whereBetween('date', [$from, $to])
+            ->when($request->filled('consumer_type'), fn ($query) => $query->where('consumer_type', $request->consumer_type))
+            ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
+            ->get()
+            ->groupBy(function ($issue) {
+                if ($issue->consumer_type === 'machine') {
+                    return 'machine|'.($issue->machine?->name ?: 'Unknown Machine');
+                }
+
+                return $issue->consumer_type.'|'.($issue->consumer_name ?: 'Unknown');
+            })
+            ->map(function ($group, $key) {
+                [$consumerType, $consumer] = explode('|', $key, 2);
+
+                return [
+                    'consumer_type' => $consumerType,
+                    'consumer' => $consumer,
+                    'issues_count' => $group->count(),
+                    'total_quantity' => (float) $group->sum('quantity'),
+                ];
+            })
+            ->values()
+            ->sortBy(['consumer_type', 'consumer'])
+            ->values();
     }
 }
