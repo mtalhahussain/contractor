@@ -333,20 +333,6 @@ return [
 
         ['header' => 'REPORTS'],
         ['text' => 'Reports', 'route' => 'reports.index', 'icon' => 'fas fa-chart-line'],
-        ['text' => 'Machine Hours Report', 'route' => 'reports.machine-hours', 'icon' => 'fas fa-receipt'],
-        ['text' => 'Diesel Usage Report', 'route' => 'reports.diesel-usage', 'icon' => 'fas fa-gas-pump'],
-        ['text' => 'Complete Hisab', 'route' => 'reports.complete-hisab', 'icon' => 'fas fa-balance-scale'],
-        ['text' => 'Machine Ledger', 'route' => 'reports.machine-ledger', 'icon' => 'fas fa-book'],
-        ['text' => 'Daily Summary', 'route' => 'reports.daily-summary', 'icon' => 'fas fa-calendar-day'],
-        ['text' => 'Monthly Summary', 'route' => 'reports.monthly-summary', 'icon' => 'fas fa-calendar-alt'],
-        ['text' => 'Salary Report', 'route' => 'salary-reports.index', 'icon' => 'fas fa-money-bill-wave'],
-        ['text' => 'Salary Summary', 'route' => 'salary-reports.summary', 'icon' => 'fas fa-chart-bar'],
-        ['text' => 'Inventory Stock Report', 'route' => 'reports.inventory-stock', 'icon' => 'fas fa-boxes'],
-        ['text' => 'Part Usage Report', 'route' => 'reports.part-usage', 'icon' => 'fas fa-tools'],
-        ['text' => 'Machine-wise Consumption', 'route' => 'reports.machine-parts', 'icon' => 'fas fa-industry'],
-        ['text' => 'Fuel Stock Report', 'route' => 'reports.fuel-stock', 'icon' => 'fas fa-gas-pump'],
-        ['text' => 'Fuel Issue Report', 'route' => 'reports.fuel-issues', 'icon' => 'fas fa-oil-can'],
-        ['text' => 'Fuel Consumption Summary', 'route' => 'reports.fuel-consumption', 'icon' => 'fas fa-chart-bar'],
     ],
 
     /*

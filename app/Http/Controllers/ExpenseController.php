@@ -6,10 +6,21 @@ use App\Models\Expense;
 use App\Models\Machine;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ExpenseController extends Controller
 {
+    private const EXPENSE_TYPES = [
+        'Fuel',
+        'Repair & Maintenance',
+        'Spare Parts',
+        'Tyre & Tube',
+        'Labour',
+        'Transport',
+        'Miscellaneous',
+    ];
+
     public function index(): View
     {
         $expenses = Expense::query()->with('machine')->latest('date')->paginate(30);
@@ -21,7 +32,10 @@ class ExpenseController extends Controller
     {
         $machines = Machine::query()->orderBy('name')->get();
 
-        return view('expenses.create', compact('machines'));
+        return view('expenses.create', [
+            'machines' => $machines,
+            'expenseTypes' => self::EXPENSE_TYPES,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -29,7 +43,7 @@ class ExpenseController extends Controller
         $validated = $request->validate([
             'date' => ['required', 'date'],
             'machine_id' => ['nullable', 'exists:machines,id'],
-            'expense_type' => ['required', 'string', 'max:255'],
+            'expense_type' => ['required', Rule::in(self::EXPENSE_TYPES)],
             'amount' => ['required', 'numeric', 'min:0'],
             'remarks' => ['nullable', 'string'],
         ]);
@@ -49,7 +63,11 @@ class ExpenseController extends Controller
     {
         $machines = Machine::query()->orderBy('name')->get();
 
-        return view('expenses.edit', compact('expense', 'machines'));
+        return view('expenses.edit', [
+            'expense' => $expense,
+            'machines' => $machines,
+            'expenseTypes' => self::EXPENSE_TYPES,
+        ]);
     }
 
     public function update(Request $request, Expense $expense): RedirectResponse
@@ -57,7 +75,7 @@ class ExpenseController extends Controller
         $validated = $request->validate([
             'date' => ['required', 'date'],
             'machine_id' => ['nullable', 'exists:machines,id'],
-            'expense_type' => ['required', 'string', 'max:255'],
+            'expense_type' => ['required', Rule::in(self::EXPENSE_TYPES)],
             'amount' => ['required', 'numeric', 'min:0'],
             'remarks' => ['nullable', 'string'],
         ]);
