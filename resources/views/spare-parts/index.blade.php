@@ -13,10 +13,6 @@
     @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
     @if (session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 
-    <div class="alert alert-info mb-3">
-        <strong>Easy Flow:</strong> 1) Add part, 2) use <em>Stock In / Out</em> to adjust stock, 3) use <em>Machine Part Usage</em> when a part is consumed on a machine.
-    </div>
-
     <form method="GET" class="card card-body mb-3">
         <div class="form-row">
             <div class="col-md-10">
