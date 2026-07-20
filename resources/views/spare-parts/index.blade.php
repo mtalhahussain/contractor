@@ -13,6 +13,21 @@
     @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
     @if (session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 
+    <div class="alert alert-info mb-3">
+        <strong>Easy Flow:</strong> 1) Add part, 2) use <em>Stock In / Out</em> to adjust stock, 3) use <em>Machine Part Usage</em> when a part is consumed on a machine.
+    </div>
+
+    <form method="GET" class="card card-body mb-3">
+        <div class="form-row">
+            <div class="col-md-10">
+                <input type="text" name="q" class="form-control" value="{{ request('q') }}" placeholder="Search by part name, part no, category, or location">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary btn-block">Search</button>
+            </div>
+        </div>
+    </form>
+
     <div class="card">
         <div class="card-body table-responsive p-0">
             <table class="table table-striped mb-0">
@@ -22,7 +37,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($parts as $part)
+                    @forelse($parts as $part)
                         <tr>
                             <td>{{ $part->name }}</td>
                             <td>{{ $part->part_number }}</td>
@@ -38,6 +53,7 @@
                                 @endif
                             </td>
                             <td class="text-nowrap">
+                                <a href="{{ route('part-stock-movements.create', ['spare_part_id' => $part->id]) }}" class="btn btn-sm btn-secondary">Add Stock Entry</a>
                                 <a href="{{ route('spare-parts.edit', $part) }}" class="btn btn-sm btn-info">Edit</a>
                                 <form action="{{ route('spare-parts.destroy', $part) }}" method="POST" class="d-inline">
                                     @csrf @method('DELETE')
@@ -45,7 +61,9 @@
                                 </form>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr><td colspan="8" class="text-center py-3">No spare parts found.</td></tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

@@ -10,16 +10,36 @@ use Illuminate\View\View;
 
 class FuelStockController extends Controller
 {
+    private const FUEL_UNITS = [
+        'liters',
+        'gallons',
+        'barrels',
+    ];
+
     public function index(): View
     {
-        $stocks = FuelStock::query()->latest()->paginate(25);
+        $stocks = FuelStock::query()
+            ->when(request()->filled('q'), function ($query) {
+                $search = trim((string) request('q'));
+
+                $query->where(function ($inner) use ($search) {
+                    $inner->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('code', 'like', '%'.$search.'%')
+                        ->orWhere('location', 'like', '%'.$search.'%');
+                });
+            })
+            ->latest()
+            ->paginate(25)
+            ->withQueryString();
 
         return view('fuel-stocks.index', compact('stocks'));
     }
 
     public function create(): View
     {
-        return view('fuel-stocks.create');
+        return view('fuel-stocks.create', [
+            'units' => self::FUEL_UNITS,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -27,7 +47,7 @@ class FuelStockController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:255', 'unique:fuel_stocks,code'],
-            'unit' => ['required', 'string', 'max:20'],
+            'unit' => ['required', Rule::in(self::FUEL_UNITS)],
             'current_stock' => ['required', 'numeric', 'min:0'],
             'minimum_stock' => ['required', 'numeric', 'min:0'],
             'location' => ['nullable', 'string', 'max:255'],
@@ -47,7 +67,10 @@ class FuelStockController extends Controller
 
     public function edit(FuelStock $fuel_stock): View
     {
-        return view('fuel-stocks.edit', ['stock' => $fuel_stock]);
+        return view('fuel-stocks.edit', [
+            'stock' => $fuel_stock,
+            'units' => self::FUEL_UNITS,
+        ]);
     }
 
     public function update(Request $request, FuelStock $fuel_stock): RedirectResponse
@@ -55,7 +78,7 @@ class FuelStockController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:255', Rule::unique('fuel_stocks', 'code')->ignore($fuel_stock->id)],
-            'unit' => ['required', 'string', 'max:20'],
+            'unit' => ['required', Rule::in(self::FUEL_UNITS)],
             'minimum_stock' => ['required', 'numeric', 'min:0'],
             'location' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],

@@ -12,6 +12,9 @@
 @section('content')
 @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 @if (session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
+<div class="alert alert-info">
+    <strong>Tip:</strong> Use <em>Stock In</em> when new parts arrive and <em>Stock Out</em> for manual deductions. For machine jobs, prefer <em>Machine Part Usage</em> so stock updates automatically.
+</div>
 <div class="card"><div class="card-body table-responsive p-0">
 <table class="table table-striped mb-0">
     <thead><tr><th>Date</th><th>Part</th><th>Type</th><th>Qty</th><th>Machine</th><th>Balance After</th><th>Reference</th><th>Action</th></tr></thead>

@@ -12,6 +12,7 @@ use App\Models\Machine;
 use App\Models\MachineHourEntry;
 use App\Models\MachinePartUsage;
 use App\Models\Payment;
+use App\Models\Site;
 use App\Models\SparePart;
 use App\Services\RateResolverService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -35,8 +36,13 @@ class ReportController extends Controller
     public function machineHours(Request $request, RateResolverService $rateResolver): View
     {
         [$from, $to] = $this->dateRange($request);
+        $siteId = $this->selectedSiteId($request);
 
-        $entries = MachineHourEntry::query()
+        $entries = $this->applySiteFilterByMachineAssignment(
+            MachineHourEntry::query(),
+            $siteId,
+            'machine_hour_entries.date'
+        )
             ->with('machine')
             ->whereBetween('date', [$from, $to])
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
@@ -58,7 +64,8 @@ class ReportController extends Controller
 
         return view('reports.machine-hours', [
             'rows' => $rows,
-            'machines' => Machine::query()->orderBy('name')->get(),
+            'machines' => $this->machineOptionsForRange($siteId, $from, $to),
+            'sites' => $this->activeSiteOptions(),
             'from' => $from,
             'to' => $to,
         ]);
@@ -67,8 +74,13 @@ class ReportController extends Controller
     public function dieselUsage(Request $request, RateResolverService $rateResolver): View
     {
         [$from, $to] = $this->dateRange($request);
+        $siteId = $this->selectedSiteId($request);
 
-        $entries = DieselUsageEntry::query()
+        $entries = $this->applySiteFilterByMachineAssignment(
+            DieselUsageEntry::query(),
+            $siteId,
+            'diesel_usage_entries.date'
+        )
             ->with('machine')
             ->whereBetween('date', [$from, $to])
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
@@ -90,7 +102,8 @@ class ReportController extends Controller
 
         return view('reports.diesel-usage', [
             'rows' => $rows,
-            'machines' => Machine::query()->orderBy('name')->get(),
+            'machines' => $this->machineOptionsForRange($siteId, $from, $to),
+            'sites' => $this->activeSiteOptions(),
             'from' => $from,
             'to' => $to,
         ]);
@@ -99,19 +112,28 @@ class ReportController extends Controller
     public function completeHisab(Request $request, RateResolverService $rateResolver): View
     {
         [$from, $to] = $this->dateRange($request);
+        $siteId = $this->selectedSiteId($request);
 
-        $machines = Machine::query()
+        $machines = $this->applySiteOverlapToMachineQuery(Machine::query(), $siteId, $from, $to)
             ->when($request->filled('machine_id'), fn ($query) => $query->where('id', $request->machine_id))
             ->orderBy('name')
             ->get();
 
-        $rows = $machines->map(function ($machine) use ($from, $to, $rateResolver) {
-            $hoursEntries = MachineHourEntry::query()
+        $rows = $machines->map(function ($machine) use ($from, $to, $rateResolver, $siteId) {
+            $hoursEntries = $this->applySiteFilterByMachineAssignment(
+                MachineHourEntry::query(),
+                $siteId,
+                'machine_hour_entries.date'
+            )
                 ->where('machine_id', $machine->id)
                 ->whereBetween('date', [$from, $to])
                 ->get();
 
-            $dieselEntries = DieselUsageEntry::query()
+            $dieselEntries = $this->applySiteFilterByMachineAssignment(
+                DieselUsageEntry::query(),
+                $siteId,
+                'diesel_usage_entries.date'
+            )
                 ->where('machine_id', $machine->id)
                 ->whereBetween('date', [$from, $to])
                 ->get();
@@ -126,12 +148,20 @@ class ReportController extends Controller
                 return (float) $entry->diesel_liters * $rateResolver->getDieselRate($entry->date);
             });
 
-            $totalPayments = (float) Payment::query()
+            $totalPayments = (float) $this->applySiteFilterByMachineAssignment(
+                Payment::query(),
+                $siteId,
+                'payments.date'
+            )
                 ->where('machine_id', $machine->id)
                 ->whereBetween('date', [$from, $to])
                 ->sum('amount_received');
 
-            $totalExpenses = (float) Expense::query()
+            $totalExpenses = (float) $this->applySiteFilterByMachineAssignment(
+                Expense::query(),
+                $siteId,
+                'expenses.date'
+            )
                 ->where('machine_id', $machine->id)
                 ->whereBetween('date', [$from, $to])
                 ->sum('amount');
@@ -150,7 +180,8 @@ class ReportController extends Controller
 
         return view('reports.complete-hisab', [
             'rows' => $rows,
-            'machines' => Machine::query()->orderBy('name')->get(),
+            'machines' => $this->machineOptionsForRange($siteId, $from, $to),
+            'sites' => $this->activeSiteOptions(),
             'from' => $from,
             'to' => $to,
         ]);
@@ -159,15 +190,32 @@ class ReportController extends Controller
     public function machineLedger(Request $request, RateResolverService $rateResolver): View
     {
         [$from, $to] = $this->dateRange($request);
-        $machines = Machine::query()->orderBy('name')->get();
+        $siteId = $this->selectedSiteId($request);
+        $machines = $this->machineOptionsForRange($siteId, $from, $to);
         $machineId = (int) ($request->machine_id ?: ($machines->first()->id ?? 0));
 
         $rows = collect();
         if ($machineId > 0) {
-            $hours = MachineHourEntry::query()->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
-            $diesel = DieselUsageEntry::query()->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
-            $payments = Payment::query()->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
-            $expenses = Expense::query()->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
+            $hours = $this->applySiteFilterByMachineAssignment(
+                MachineHourEntry::query(),
+                $siteId,
+                'machine_hour_entries.date'
+            )->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
+            $diesel = $this->applySiteFilterByMachineAssignment(
+                DieselUsageEntry::query(),
+                $siteId,
+                'diesel_usage_entries.date'
+            )->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
+            $payments = $this->applySiteFilterByMachineAssignment(
+                Payment::query(),
+                $siteId,
+                'payments.date'
+            )->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
+            $expenses = $this->applySiteFilterByMachineAssignment(
+                Expense::query(),
+                $siteId,
+                'expenses.date'
+            )->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
 
             foreach ($hours as $entry) {
                 $amount = (float) $entry->working_hours * $rateResolver->getMachineRate($entry->machine_id, $entry->date);
@@ -218,7 +266,9 @@ class ReportController extends Controller
             });
         }
 
-        return view('reports.machine-ledger', compact('rows', 'machines', 'machineId', 'from', 'to'));
+        $sites = $this->activeSiteOptions();
+
+        return view('reports.machine-ledger', compact('rows', 'machines', 'machineId', 'from', 'to', 'sites'));
     }
 
     public function dailySummary(Request $request, RateResolverService $rateResolver): View
@@ -558,10 +608,64 @@ class ReportController extends Controller
         return [$from, $to];
     }
 
+    private function selectedSiteId(Request $request): ?int
+    {
+        return $request->filled('site_id') ? (int) $request->site_id : null;
+    }
+
+    private function machineOptionsForRange(?int $siteId, string $from, string $to): Collection
+    {
+        return $this->applySiteOverlapToMachineQuery(Machine::query(), $siteId, $from, $to)
+            ->orderBy('name')
+            ->get();
+    }
+
+    private function activeSiteOptions(): Collection
+    {
+        return Site::query()
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+    }
+
+    private function applySiteOverlapToMachineQuery($query, ?int $siteId, string $from, string $to)
+    {
+        return $query->when($siteId, function ($machineQuery) use ($siteId, $from, $to) {
+            $machineQuery->whereHas('siteAssignments', function ($assignmentQuery) use ($siteId, $from, $to) {
+                $assignmentQuery->where('site_id', $siteId)
+                    ->where('assigned_from', '<=', $to)
+                    ->where(function ($inner) use ($from) {
+                        $inner->whereNull('assigned_to')
+                            ->orWhere('assigned_to', '>=', $from);
+                    });
+            });
+        });
+    }
+
+    private function applySiteFilterByMachineAssignment($query, ?int $siteId, string $dateColumn)
+    {
+        return $query->when($siteId, function ($entryQuery) use ($siteId, $dateColumn) {
+            $entryQuery->whereHas('machine.siteAssignments', function ($assignmentQuery) use ($siteId, $dateColumn) {
+                $assignmentQuery->where('site_id', $siteId)
+                    ->whereColumn('machine_site_assignments.assigned_from', '<=', $dateColumn)
+                    ->where(function ($inner) use ($dateColumn) {
+                        $inner->whereNull('machine_site_assignments.assigned_to')
+                            ->orWhereColumn('machine_site_assignments.assigned_to', '>=', $dateColumn);
+                    });
+            });
+        });
+    }
+
     private function machineHoursData(Request $request, RateResolverService $rateResolver): Collection
     {
         [$from, $to] = $this->dateRange($request);
-        return MachineHourEntry::query()
+        $siteId = $this->selectedSiteId($request);
+
+        return $this->applySiteFilterByMachineAssignment(
+            MachineHourEntry::query(),
+            $siteId,
+            'machine_hour_entries.date'
+        )
             ->with('machine')
             ->whereBetween('date', [$from, $to])
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
@@ -579,7 +683,13 @@ class ReportController extends Controller
     private function dieselUsageData(Request $request, RateResolverService $rateResolver): Collection
     {
         [$from, $to] = $this->dateRange($request);
-        return DieselUsageEntry::query()
+        $siteId = $this->selectedSiteId($request);
+
+        return $this->applySiteFilterByMachineAssignment(
+            DieselUsageEntry::query(),
+            $siteId,
+            'diesel_usage_entries.date'
+        )
             ->with('machine')
             ->whereBetween('date', [$from, $to])
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
@@ -597,18 +707,36 @@ class ReportController extends Controller
     private function completeHisabData(Request $request, RateResolverService $rateResolver): Collection
     {
         [$from, $to] = $this->dateRange($request);
-        $machines = Machine::query()
+        $siteId = $this->selectedSiteId($request);
+
+        $machines = $this->applySiteOverlapToMachineQuery(Machine::query(), $siteId, $from, $to)
             ->when($request->filled('machine_id'), fn ($query) => $query->where('id', $request->machine_id))
             ->orderBy('name')
             ->get();
 
-        return $machines->map(function ($machine) use ($from, $to, $rateResolver) {
-            $hoursEntries = MachineHourEntry::query()->where('machine_id', $machine->id)->whereBetween('date', [$from, $to])->get();
-            $dieselEntries = DieselUsageEntry::query()->where('machine_id', $machine->id)->whereBetween('date', [$from, $to])->get();
+        return $machines->map(function ($machine) use ($from, $to, $rateResolver, $siteId) {
+            $hoursEntries = $this->applySiteFilterByMachineAssignment(
+                MachineHourEntry::query(),
+                $siteId,
+                'machine_hour_entries.date'
+            )->where('machine_id', $machine->id)->whereBetween('date', [$from, $to])->get();
+            $dieselEntries = $this->applySiteFilterByMachineAssignment(
+                DieselUsageEntry::query(),
+                $siteId,
+                'diesel_usage_entries.date'
+            )->where('machine_id', $machine->id)->whereBetween('date', [$from, $to])->get();
             $grossAmount = $hoursEntries->sum(fn ($entry) => (float) $entry->working_hours * $rateResolver->getMachineRate($entry->machine_id, $entry->date));
             $dieselCost = $dieselEntries->sum(fn ($entry) => (float) $entry->diesel_liters * $rateResolver->getDieselRate($entry->date));
-            $payments = (float) Payment::query()->where('machine_id', $machine->id)->whereBetween('date', [$from, $to])->sum('amount_received');
-            $expenses = (float) Expense::query()->where('machine_id', $machine->id)->whereBetween('date', [$from, $to])->sum('amount');
+            $payments = (float) $this->applySiteFilterByMachineAssignment(
+                Payment::query(),
+                $siteId,
+                'payments.date'
+            )->where('machine_id', $machine->id)->whereBetween('date', [$from, $to])->sum('amount_received');
+            $expenses = (float) $this->applySiteFilterByMachineAssignment(
+                Expense::query(),
+                $siteId,
+                'expenses.date'
+            )->where('machine_id', $machine->id)->whereBetween('date', [$from, $to])->sum('amount');
 
             return [
                 'machine' => $machine->name,
@@ -626,13 +754,18 @@ class ReportController extends Controller
     private function machineLedgerData(Request $request, RateResolverService $rateResolver): Collection
     {
         [$from, $to] = $this->dateRange($request);
+        $siteId = $this->selectedSiteId($request);
         $machineId = (int) $request->machine_id;
         if ($machineId <= 0) {
             return collect();
         }
 
         $rows = collect();
-        $hours = MachineHourEntry::query()->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
+        $hours = $this->applySiteFilterByMachineAssignment(
+            MachineHourEntry::query(),
+            $siteId,
+            'machine_hour_entries.date'
+        )->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
         foreach ($hours as $entry) {
             $rows->push([
                 'date' => $entry->date->format('Y-m-d'),
@@ -641,7 +774,11 @@ class ReportController extends Controller
                 'credit' => (float) $entry->working_hours * $rateResolver->getMachineRate($entry->machine_id, $entry->date),
             ]);
         }
-        $diesel = DieselUsageEntry::query()->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
+        $diesel = $this->applySiteFilterByMachineAssignment(
+            DieselUsageEntry::query(),
+            $siteId,
+            'diesel_usage_entries.date'
+        )->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
         foreach ($diesel as $entry) {
             $rows->push([
                 'date' => $entry->date->format('Y-m-d'),
@@ -650,7 +787,11 @@ class ReportController extends Controller
                 'credit' => 0,
             ]);
         }
-        $payments = Payment::query()->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
+        $payments = $this->applySiteFilterByMachineAssignment(
+            Payment::query(),
+            $siteId,
+            'payments.date'
+        )->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
         foreach ($payments as $entry) {
             $rows->push([
                 'date' => $entry->date->format('Y-m-d'),
@@ -659,7 +800,11 @@ class ReportController extends Controller
                 'credit' => 0,
             ]);
         }
-        $expenses = Expense::query()->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
+        $expenses = $this->applySiteFilterByMachineAssignment(
+            Expense::query(),
+            $siteId,
+            'expenses.date'
+        )->where('machine_id', $machineId)->whereBetween('date', [$from, $to])->get();
         foreach ($expenses as $entry) {
             $rows->push([
                 'date' => $entry->date->format('Y-m-d'),

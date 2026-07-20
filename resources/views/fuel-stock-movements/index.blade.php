@@ -9,6 +9,9 @@
 @section('content')
     @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
     @if (session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
+    <div class="alert alert-info">
+        <strong>Tip:</strong> Use this screen for fuel refill/manual adjustments. For daily consumption issue, use <em>Fuel Issues</em> so stock is deducted automatically.
+    </div>
     <div class="card"><div class="card-body table-responsive p-0"><table class="table table-striped mb-0"><thead><tr><th>Date</th><th>Tank / Store</th><th>Type</th><th>Quantity (L)</th><th>Balance (L)</th><th>Reference</th><th>Action</th></tr></thead><tbody>@forelse($movements as $movement)<tr><td>{{ $movement->date?->format('Y-m-d') }}</td><td>{{ $movement->fuelStock?->name }}</td><td>{{ str_replace('_', ' ', ucfirst($movement->movement_type)) }}</td><td>{{ number_format((float) $movement->quantity, 2) }} L</td><td>{{ number_format((float) $movement->balance_after, 2) }} L</td><td>{{ $movement->reference }}</td><td class="text-nowrap">@if(!$movement->fuel_issue_id)<a href="{{ route('fuel-stock-movements.edit', $movement) }}" class="btn btn-sm btn-info">Edit</a><form action="{{ route('fuel-stock-movements.destroy', $movement) }}" method="POST" class="d-inline">@csrf @method('DELETE')<button class="btn btn-sm btn-danger" onclick="return confirm('Delete movement?')">Delete</button></form>@else<span class="badge badge-secondary">From Fuel Issue</span>@endif</td></tr>@empty<tr><td colspan="7" class="text-center py-3">No movement found.</td></tr>@endforelse</tbody></table></div></div>
     {{ $movements->links() }}
 @stop

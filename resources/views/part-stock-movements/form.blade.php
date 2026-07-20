@@ -6,6 +6,10 @@
     </div>
 @endif
 
+<div class="alert alert-light border">
+    <strong>How to use:</strong> Select part, choose <em>Stock In</em> for received items or <em>Stock Out</em> for manual deduction, then enter quantity.
+</div>
+
 <div class="form-row">
     <div class="form-group col-md-3">
         <label>Date</label>
@@ -25,8 +29,8 @@
     <div class="form-group col-md-3">
         <label>Movement Type</label>
         <select name="movement_type" class="form-control" required>
-            <option value="stock_in" @selected(old('movement_type', $movement?->movement_type ?? 'stock_in') === 'stock_in')>Stock In</option>
-            <option value="stock_out" @selected(old('movement_type', $movement?->movement_type) === 'stock_out')>Stock Out</option>
+            <option value="stock_in" @selected(old('movement_type', $movement?->movement_type ?? 'stock_in') === 'stock_in')>Stock In (Receive)</option>
+            <option value="stock_out" @selected(old('movement_type', $movement?->movement_type) === 'stock_out')>Stock Out (Deduct)</option>
         </select>
     </div>
     <div class="form-group col-md-3">
@@ -44,6 +48,7 @@
                 <option value="{{ $machine->id }}" @selected(old('machine_id', $movement?->machine_id) == $machine->id)>{{ $machine->name }}</option>
             @endforeach
         </select>
+        <small class="form-text text-muted">Only select machine if this movement is related to a specific machine.</small>
     </div>
     <div class="form-group col-md-4">
         <label>Reference</label>

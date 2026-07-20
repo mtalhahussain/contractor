@@ -6,6 +6,10 @@
     </div>
 @endif
 
+<div class="alert alert-light border">
+    <strong>How to use:</strong> Record only actual part consumption on machines. Stock will reduce automatically after save.
+</div>
+
 <div class="form-row">
     <div class="form-group col-md-3">
         <label>Date</label>
@@ -32,6 +36,7 @@
     <div class="form-group col-md-3">
         <label>Quantity</label>
         <input type="number" step="0.01" min="0.01" name="quantity" class="form-control" value="{{ old('quantity', $entry?->quantity) }}" required>
+        <small class="form-text text-muted">Enter consumed quantity only.</small>
     </div>
 </div>
 

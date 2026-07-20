@@ -12,6 +12,9 @@
 @section('content')
 @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 @if (session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
+<div class="alert alert-info">
+    <strong>Tip:</strong> Add usage when a part is consumed on a machine. Stock balance will be reduced automatically and reflected in movement history.
+</div>
 <div class="card"><div class="card-body table-responsive p-0">
 <table class="table table-striped mb-0">
     <thead><tr><th>Date</th><th>Machine</th><th>Part</th><th>Type</th><th>Quantity</th><th>Reference</th><th>Remarks</th><th>Action</th></tr></thead>

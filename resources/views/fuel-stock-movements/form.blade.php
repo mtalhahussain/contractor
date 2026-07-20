@@ -6,6 +6,10 @@
     </div>
 @endif
 
+<div class="alert alert-light border">
+    <strong>How to use:</strong> Use this for refill/manual adjustments. For day-to-day fuel consumption, use <em>Fuel Issues</em> screen.
+</div>
+
 @php($movement = $movement ?? null)
 @php($selectedStockId = $selectedStockId ?? null)
 
@@ -28,8 +32,8 @@
     <div class="form-group col-md-3">
         <label>Movement Type</label>
         <select name="movement_type" class="form-control" required>
-            <option value="stock_in" @selected(old('movement_type', $movement?->movement_type ?? 'stock_in') === 'stock_in')>Stock In</option>
-            <option value="stock_out" @selected(old('movement_type', $movement?->movement_type) === 'stock_out')>Stock Out</option>
+            <option value="stock_in" @selected(old('movement_type', $movement?->movement_type ?? 'stock_in') === 'stock_in')>Stock In (Refill)</option>
+            <option value="stock_out" @selected(old('movement_type', $movement?->movement_type) === 'stock_out')>Stock Out (Adjustment)</option>
         </select>
     </div>
     <div class="form-group col-md-2">

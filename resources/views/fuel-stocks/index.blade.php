@@ -13,6 +13,21 @@
     @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
     @if (session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 
+    <div class="alert alert-info mb-3">
+        <strong>Easy Flow:</strong> 1) Add fuel tank/store, 2) use <em>Fuel Stock In / Out</em> for refill/adjustment, 3) use <em>Fuel Issues</em> when fuel is consumed.
+    </div>
+
+    <form method="GET" class="card card-body mb-3">
+        <div class="form-row">
+            <div class="col-md-10">
+                <input type="text" name="q" class="form-control" value="{{ request('q') }}" placeholder="Search by tank/store name, code, or location">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary btn-block">Search</button>
+            </div>
+        </div>
+    </form>
+
     <div class="card">
         <div class="card-body table-responsive p-0">
             <table class="table table-striped mb-0">
@@ -37,7 +52,7 @@
                                 @endif
                             </td>
                             <td class="text-nowrap">
-                                <a href="{{ route('fuel-stock-movements.create', ['fuel_stock_id' => $stock->id]) }}" class="btn btn-sm btn-secondary">Add In/Out</a>
+                                <a href="{{ route('fuel-stock-movements.create', ['fuel_stock_id' => $stock->id]) }}" class="btn btn-sm btn-secondary">Add Stock Entry</a>
                                 <a href="{{ route('fuel-stocks.edit', $stock) }}" class="btn btn-sm btn-info">Edit</a>
                                 <form action="{{ route('fuel-stocks.destroy', $stock) }}" method="POST" class="d-inline">
                                     @csrf @method('DELETE')

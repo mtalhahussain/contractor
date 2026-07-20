@@ -4,12 +4,12 @@
 @section('content')
 <form class="card card-body mb-3" method="GET">
     <div class="form-row">
-        <div class="col-md-3"><input type="date" name="from" class="form-control" value="{{ request('from', $from) }}"></div>
-        <div class="col-md-3"><input type="date" name="to" class="form-control" value="{{ request('to', $to) }}"></div>
+        <div class="col-md-2"><input type="date" name="from" class="form-control" value="{{ request('from', $from) }}"></div>
+        <div class="col-md-2"><input type="date" name="to" class="form-control" value="{{ request('to', $to) }}"></div>
         <div class="col-md-3"><select name="consumer_type" class="form-control"><option value="">All Types</option><option value="machine" @selected(request('consumer_type') === 'machine')>Machine</option><option value="generator" @selected(request('consumer_type') === 'generator')>Generator</option><option value="vehicle" @selected(request('consumer_type') === 'vehicle')>Vehicle</option><option value="equipment" @selected(request('consumer_type') === 'equipment')>Equipment</option><option value="other" @selected(request('consumer_type') === 'other')>Other</option></select></div>
         <div class="col-md-3"><select name="machine_id" class="form-control"><option value="">All Machines</option>@foreach($machines as $machine)<option value="{{ $machine->id }}" @selected(request('machine_id') == $machine->id)>{{ $machine->name }}</option>@endforeach</select></div>
+        <div class="col-md-2"><button class="btn btn-primary btn-block">Filter</button></div>
     </div>
-    <div class="form-row mt-2"><div class="col-md-2"><button class="btn btn-primary btn-block">Filter</button></div></div>
 </form>
 <div class="mb-2"><a class="btn btn-sm btn-success" href="{{ route('reports.export', ['report' => 'fuel-consumption', 'format' => 'excel'] + request()->query()) }}">Excel</a> <a class="btn btn-sm btn-danger" href="{{ route('reports.export', ['report' => 'fuel-consumption', 'format' => 'pdf'] + request()->query()) }}">PDF</a></div>
 <div class="card"><div class="card-body table-responsive p-0"><table class="table table-striped"><thead><tr><th>Consumer Type</th><th>Consumer</th><th>Issues Count</th><th>Total Quantity</th></tr></thead><tbody>@forelse($rows as $row)<tr><td>{{ ucfirst($row['consumer_type']) }}</td><td>{{ $row['consumer'] }}</td><td>{{ $row['issues_count'] }}</td><td>{{ number_format($row['total_quantity'], 2) }}</td></tr>@empty<tr><td colspan="4" class="text-center py-3">No records found.</td></tr>@endforelse</tbody></table></div></div>

@@ -6,6 +6,10 @@
     </div>
 @endif
 
+<div class="alert alert-light border">
+    <strong>How to use:</strong> Select fuel tank, consumer type, and issued quantity. Stock balance will be updated automatically.
+</div>
+
 @php($issue = $issue ?? null)
 
 <div class="form-row">
@@ -38,6 +42,7 @@
     <div class="form-group col-md-3">
         <label>Quantity</label>
         <input type="number" step="0.01" min="0.01" name="quantity" class="form-control" value="{{ old('quantity', $issue?->quantity) }}" required>
+        <small class="form-text text-muted">Enter issued quantity only.</small>
     </div>
 </div>
 

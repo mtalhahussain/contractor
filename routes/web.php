@@ -4,6 +4,8 @@ use App\Http\Controllers\BulkEntryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DieselRateHistoryController;
 use App\Http\Controllers\DieselUsageEntryController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EmployeeLeaveController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FuelIssueController;
 use App\Http\Controllers\FuelStockController;
@@ -16,6 +18,10 @@ use App\Http\Controllers\PartStockMovementController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SalaryAdvanceController;
+use App\Http\Controllers\SalaryHistoryController;
+use App\Http\Controllers\SalaryReportController;
+use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SparePartController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +31,28 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Employee Management
+    Route::resource('employees', EmployeeController::class);
+    Route::resource('sites', SiteController::class);
+    Route::get('/employees/{employee}/salary', [EmployeeController::class, 'salary'])->name('employees.salary');
+    Route::post('/employees/{employee}/salary-histories', [SalaryHistoryController::class, 'store'])->name('salary-histories.store');
+    Route::put('/employees/{employee}/salary-histories/{salaryHistory}', [SalaryHistoryController::class, 'update'])->name('salary-histories.update');
+    Route::delete('/employees/{employee}/salary-histories/{salaryHistory}', [SalaryHistoryController::class, 'destroy'])->name('salary-histories.destroy');
+    Route::get('/employees/{employee}/salary-histories', [SalaryHistoryController::class, 'getHistory'])->name('salary-histories.get-history');
+    Route::post('/employees/{employee}/salary-advances', [SalaryAdvanceController::class, 'store'])->name('salary-advances.store');
+    Route::post('/employees/{employee}/salary-advances/{advance}/approve', [SalaryAdvanceController::class, 'approve'])->name('salary-advances.approve');
+    Route::post('/employees/{employee}/salary-advances/{advance}/reject', [SalaryAdvanceController::class, 'reject'])->name('salary-advances.reject');
+    Route::delete('/employees/{employee}/salary-advances/{advance}', [SalaryAdvanceController::class, 'destroy'])->name('salary-advances.destroy');
+    Route::get('/employees/{employee}/salary-advances', [SalaryAdvanceController::class, 'getAdvances'])->name('salary-advances.get-advances');
+
+    // Employee Leave Management
+    Route::post('/employees/{employee}/leaves', [EmployeeLeaveController::class, 'store'])->name('employee-leaves.store');
+    Route::delete('/employees/{employee}/leaves/{leave}', [EmployeeLeaveController::class, 'destroy'])->name('employee-leaves.destroy');
+
+    // Salary Reports
+    Route::get('/reports/salary', [SalaryReportController::class, 'index'])->name('salary-reports.index');
+    Route::get('/reports/salary/summary', [SalaryReportController::class, 'summary'])->name('salary-reports.summary');
 
     Route::resource('machines', MachineController::class);
     Route::resource('machine-rates', MachineRateHistoryController::class);

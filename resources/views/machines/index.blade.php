@@ -17,7 +17,7 @@
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>Name</th><th>Type</th><th>Owner</th><th>Code</th><th>Status</th><th>Action</th>
+                        <th>Name</th><th>Type</th><th>Owner</th><th>Site</th><th>Code</th><th>Status</th><th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -26,6 +26,7 @@
                             <td>{{ $machine->name }}</td>
                             <td>{{ $machine->type }}</td>
                             <td>{{ $machine->owner_category }}</td>
+                            <td>{{ $machine->currentSiteAssignment?->site?->name ?? '-' }}</td>
                             <td>{{ $machine->machine_code }}</td>
                             <td>{{ $machine->status }}</td>
                             <td class="text-nowrap">

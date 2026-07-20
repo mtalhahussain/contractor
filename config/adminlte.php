@@ -303,9 +303,11 @@ return [
         ['text' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'fas fa-home'],
 
         ['header' => 'MASTER'],
+        ['text' => 'Sites', 'route' => 'sites.index', 'icon' => 'fas fa-map-marker-alt'],
         ['text' => 'Machines', 'route' => 'machines.index', 'icon' => 'fas fa-truck-monster'],
         ['text' => 'Machine Rates', 'route' => 'machine-rates.index', 'icon' => 'fas fa-tags'],
         ['text' => 'Diesel Rates', 'route' => 'diesel-rates.index', 'icon' => 'fas fa-gas-pump'],
+        ['text' => 'Employees', 'route' => 'employees.index', 'icon' => 'fas fa-users'],
 
         ['header' => 'ENTRY'],
         ['text' => 'Machine Hours', 'route' => 'machine-hours.index', 'icon' => 'fas fa-clock'],
@@ -337,6 +339,8 @@ return [
         ['text' => 'Machine Ledger', 'route' => 'reports.machine-ledger', 'icon' => 'fas fa-book'],
         ['text' => 'Daily Summary', 'route' => 'reports.daily-summary', 'icon' => 'fas fa-calendar-day'],
         ['text' => 'Monthly Summary', 'route' => 'reports.monthly-summary', 'icon' => 'fas fa-calendar-alt'],
+        ['text' => 'Salary Report', 'route' => 'salary-reports.index', 'icon' => 'fas fa-money-bill-wave'],
+        ['text' => 'Salary Summary', 'route' => 'salary-reports.summary', 'icon' => 'fas fa-chart-bar'],
         ['text' => 'Inventory Stock Report', 'route' => 'reports.inventory-stock', 'icon' => 'fas fa-boxes'],
         ['text' => 'Part Usage Report', 'route' => 'reports.part-usage', 'icon' => 'fas fa-tools'],
         ['text' => 'Machine-wise Consumption', 'route' => 'reports.machine-parts', 'icon' => 'fas fa-industry'],

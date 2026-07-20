@@ -4,10 +4,11 @@
 @section('content')
 <form class="card card-body mb-3" method="GET">
     <div class="form-row">
-        <div class="col-md-3"><input type="date" name="from" class="form-control" value="{{ request('from', $from) }}"></div>
-        <div class="col-md-3"><input type="date" name="to" class="form-control" value="{{ request('to', $to) }}"></div>
+        <div class="col-md-2"><input type="date" name="from" class="form-control" value="{{ request('from', $from) }}"></div>
+        <div class="col-md-2"><input type="date" name="to" class="form-control" value="{{ request('to', $to) }}"></div>
+        <div class="col-md-3"><select name="site_id" class="form-control"><option value="">All Sites</option>@foreach($sites as $site)<option value="{{ $site->id }}" @selected(request('site_id') == $site->id)>{{ $site->name }}</option>@endforeach</select></div>
         <div class="col-md-3"><select name="machine_id" class="form-control"><option value="">All Machines</option>@foreach($machines as $machine)<option value="{{ $machine->id }}" @selected(request('machine_id') == $machine->id)>{{ $machine->name }}</option>@endforeach</select></div>
-        <div class="col-md-3"><button class="btn btn-primary btn-block">Filter</button></div>
+        <div class="col-md-2"><button class="btn btn-primary btn-block">Filter</button></div>
     </div>
 </form>
 <div class="mb-2"><a class="btn btn-sm btn-success" href="{{ route('reports.export', ['report' => 'machine-hours', 'format' => 'excel'] + request()->query()) }}">Excel</a> <a class="btn btn-sm btn-danger" href="{{ route('reports.export', ['report' => 'machine-hours', 'format' => 'pdf'] + request()->query()) }}">PDF</a></div>

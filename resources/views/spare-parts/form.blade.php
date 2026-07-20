@@ -6,7 +6,13 @@
     </div>
 @endif
 
+<div class="alert alert-light border">
+    <strong>How to use:</strong> Create part master once. After that, update quantities from <em>Stock In / Out</em> and <em>Machine Part Usage</em> screens.
+</div>
+
 <div class="form-row">
+    @php($selectedCategory = old('category', $part?->category))
+    @php($selectedUnit = old('unit', $part?->unit ?? 'pcs'))
     <div class="form-group col-md-4">
         <label>Part Name</label>
         <input type="text" name="name" class="form-control" value="{{ old('name', $part?->name) }}" required>
@@ -17,14 +23,30 @@
     </div>
     <div class="form-group col-md-4">
         <label>Category</label>
-        <input type="text" name="category" class="form-control" value="{{ old('category', $part?->category) }}">
+        <select name="category" class="form-control">
+            <option value="">-- Select Category --</option>
+            @foreach($categories as $category)
+                <option value="{{ $category }}" @selected($selectedCategory === $category)>{{ $category }}</option>
+            @endforeach
+            @if($selectedCategory && !in_array($selectedCategory, $categories, true))
+                <option value="{{ $selectedCategory }}" selected>{{ $selectedCategory }} (legacy)</option>
+            @endif
+        </select>
     </div>
 </div>
 
 <div class="form-row">
     <div class="form-group col-md-3">
         <label>Unit</label>
-        <input type="text" name="unit" class="form-control" value="{{ old('unit', $part?->unit ?? 'pcs') }}" required>
+        <select name="unit" class="form-control" required>
+            @foreach($units as $unit)
+                <option value="{{ $unit }}" @selected($selectedUnit === $unit)>{{ strtoupper($unit) }}</option>
+            @endforeach
+            @if($selectedUnit && !in_array($selectedUnit, $units, true))
+                <option value="{{ $selectedUnit }}" selected>{{ strtoupper($selectedUnit) }} (legacy)</option>
+            @endif
+        </select>
+        <small class="form-text text-muted">Example: pcs, set, box</small>
     </div>
     <div class="form-group col-md-3">
         <label>{{ $part ? 'Current Stock' : 'Opening Stock' }}</label>
@@ -41,8 +63,8 @@
         <input type="number" step="0.01" min="0" name="minimum_stock" class="form-control" value="{{ old('minimum_stock', $part?->minimum_stock ?? 0) }}" required>
     </div>
     <div class="form-group col-md-3">
-        <label>Location</label>
-        <input type="text" name="location" class="form-control" value="{{ old('location', $part?->location) }}">
+        <label>Storage Location</label>
+        <input type="text" name="location" class="form-control" value="{{ old('location', $part?->location) }}" placeholder="e.g. Main Store, Site-A Container, Rack B2">
     </div>
 </div>
 
