@@ -12,14 +12,14 @@
 
     {{-- Session Status --}}
     @if (session('status'))
-        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:10px 14px; margin-bottom:18px; font-size:0.85rem; color:#166534;">
+        <div class="login-feedback" style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:10px 14px; margin-bottom:18px; font-size:0.85rem; color:#166534;">
             {{ session('status') }}
         </div>
     @endif
 
     {{-- Validation errors summary --}}
     @if ($errors->any())
-        <div style="background:#fef2f2; border:1px solid #fca5a5; border-radius:8px; padding:10px 14px; margin-bottom:18px; font-size:0.85rem; color:#991b1b;">
+        <div class="login-feedback" style="background:#fef2f2; border:1px solid #fca5a5; border-radius:8px; padding:10px 14px; margin-bottom:18px; font-size:0.85rem; color:#991b1b;">
             @foreach ($errors->all() as $error)
                 <div>{{ $error }}</div>
             @endforeach
@@ -117,6 +117,12 @@
         @media (max-width: 640px) {
             .login-header {
                 margin-bottom: 1.5rem !important;
+                text-align: center;
+            }
+
+            .login-header p,
+            .login-feedback {
+                text-align: center;
             }
 
             .login-form {
@@ -131,6 +137,7 @@
 
             .forgot-link {
                 width: 100%;
+                text-align: center;
             }
         }
     </style>
