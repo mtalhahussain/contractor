@@ -65,6 +65,46 @@
                 background: #ffffff;
             }
 
+            .auth-shell {
+                display: flex;
+                width: 100%;
+                min-height: 100vh;
+            }
+
+            .brand-panel-content {
+                position: relative;
+                z-index: 2;
+                text-align: center;
+                max-width: 420px;
+            }
+
+            .auth-card-wrap {
+                width: 100%;
+                max-width: 480px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 3rem 2.5rem;
+            }
+
+            .auth-content {
+                width: 100%;
+                max-width: 360px;
+            }
+
+            .mobile-login-logo {
+                display: none;
+            }
+
+            .mobile-login-logo img {
+                width: auto;
+                max-width: 180px;
+                max-height: 72px;
+                object-fit: contain;
+                object-position: center;
+            }
+
             .input-field {
                 border: 1.5px solid #e2e8f0;
                 border-radius: 10px;
@@ -123,19 +163,61 @@
             }
             .animate-in { animation: fadeSlideIn 0.5s ease forwards; }
 
+            @media (max-width: 1024px) {
+                .brand-panel {
+                    padding: 2.25rem 1.5rem;
+                }
+
+                .auth-card-wrap {
+                    max-width: 460px;
+                    padding: 2.5rem 1.5rem;
+                }
+            }
+
             @media (max-width: 767px) {
-                .brand-panel { display: none; }
-                .auth-card { border-radius: 0; min-height: 100vh; }
+                .brand-panel { display: none !important; }
+                .auth-card {
+                    border-radius: 0;
+                    min-height: 100vh;
+                }
+
+                .auth-card-wrap {
+                    max-width: 100%;
+                    min-height: 100vh;
+                    justify-content: flex-start;
+                    padding: 1.5rem 1rem;
+                }
+
+                .auth-content {
+                    max-width: 100%;
+                }
+
+                .mobile-login-logo {
+                    display: flex;
+                    width: 100%;
+                    justify-content: center;
+                    margin: 0 0 1rem;
+                }
+
+                .divider-line {
+                    margin: 18px 0;
+                }
+            }
+
+            @media (max-width: 400px) {
+                .auth-card-wrap {
+                    padding: 1rem 0.75rem;
+                }
             }
         </style>
     </head>
     <body class="antialiased" style="background:#1e3a5f; min-height:100vh; display:flex; align-items:stretch;">
 
-        <div style="display:flex; width:100%; min-height:100vh;">
+        <div class="auth-shell">
 
             {{-- ── LEFT BRAND PANEL ── --}}
             <div class="brand-panel" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:3rem 2.5rem; position:relative; z-index:1;">
-                <div style="position:relative; z-index:2; text-align:center; max-width:420px;">
+                <div class="brand-panel-content">
 
                     {{-- Logo --}}
                     <div class="brand-logo-ring" style="display:inline-flex; align-items:center; justify-content:center; border-radius:28px; margin-bottom:2rem;">
@@ -173,8 +255,11 @@
             </div>
 
             {{-- ── RIGHT AUTH PANEL ── --}}
-            <div class="auth-card" style="width:100%; max-width:480px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:3rem 2.5rem;">
-                <div class="animate-in" style="width:100%; max-width:360px;">
+            <div class="auth-card auth-card-wrap">
+                <div class="mobile-login-logo">
+                    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }} Logo">
+                </div>
+                <div class="animate-in auth-content">
                     {{ $slot }}
                 </div>
             </div>

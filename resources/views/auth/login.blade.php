@@ -1,7 +1,7 @@
 <x-guest-layout>
 
     {{-- Header --}}
-    <div style="margin-bottom:2rem;">
+    <div class="login-header" style="margin-bottom:2rem;">
         <h2 style="font-size:1.6rem; font-weight:800; color:#0f172a; letter-spacing:-0.4px; margin-bottom:6px;">
             Welcome back
         </h2>
@@ -26,7 +26,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('login') }}" style="display:flex; flex-direction:column; gap:18px;">
+    <form method="POST" action="{{ route('login') }}" class="login-form" style="display:flex; flex-direction:column; gap:18px;">
         @csrf
 
         {{-- Email --}}
@@ -75,13 +75,14 @@
         </div>
 
         {{-- Remember me & Forgot password --}}
-        <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="remember-row" style="display:flex; align-items:center; justify-content:space-between;">
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
                 <input id="remember_me" type="checkbox" class="remember-checkbox" name="remember">
                 <span style="font-size:0.83rem; color:#64748b; font-weight:500;">Remember me</span>
             </label>
             @if (Route::has('password.request'))
                 <a href="{{ route('password.request') }}"
+                   class="forgot-link"
                    style="font-size:0.83rem; color:#2563eb; font-weight:500; text-decoration:none; transition:color 0.15s;"
                    onmouseover="this.style.color='#1d4ed8'" onmouseout="this.style.color='#2563eb'">
                     Forgot password?
@@ -111,5 +112,27 @@
             }
         }
     </script>
+
+    <style>
+        @media (max-width: 640px) {
+            .login-header {
+                margin-bottom: 1.5rem !important;
+            }
+
+            .login-form {
+                gap: 14px !important;
+            }
+
+            .remember-row {
+                flex-wrap: wrap;
+                gap: 10px;
+                align-items: flex-start !important;
+            }
+
+            .forgot-link {
+                width: 100%;
+            }
+        }
+    </style>
 
 </x-guest-layout>

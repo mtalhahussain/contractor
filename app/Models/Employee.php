@@ -54,9 +54,16 @@ class Employee extends Model
      */
     public static function generateEmployeeCode(): string
     {
-        $lastEmployee = self::orderByDesc('id')->first();
-        $nextNumber = ($lastEmployee?->id ?? 0) + 1;
-        return 'EMP' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+        // Include soft-deleted records so codes are never re-used.
+        $nextNumber = (self::withTrashed()->max('id') ?? 0) + 1;
+
+        do {
+            $code = 'EMP' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            $exists = self::withTrashed()->where('employee_code', $code)->exists();
+            $nextNumber++;
+        } while ($exists);
+
+        return $code;
     }
 
     public function salaryHistories(): HasMany
