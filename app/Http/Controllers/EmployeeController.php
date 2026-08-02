@@ -113,7 +113,7 @@ class EmployeeController extends Controller
      */
     public function salary(Employee $employee)
     {
-        $employee->load('salaryHistories', 'salaryAdvances', 'salaryLogs');
+        $employee->load('salaryHistories', 'salaryAdvances', 'salaryLogs', 'salaryBonuses');
         return view('employees.salary-dashboard', compact('employee'));
     }
 }

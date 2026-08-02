@@ -194,6 +194,53 @@
         {{-- Add Employee Leave Card --}}
         <div class="row mt-3">
             <div class="col-md-6">
+                <div class="card card-info">
+                    <div class="card-header with-border">
+                        <h3 class="card-title">
+                            <i class="fas fa-gift"></i> Monthly Bonus
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('salary-bonuses.store', $employee) }}" method="POST">
+                            @csrf
+                            <div class="form-group">
+                                <label for="bonus_month">Bonus Month <span class="text-danger">*</span></label>
+                                <input type="month" class="form-control @error('bonus_month') is-invalid @enderror"
+                                    id="bonus_month" name="bonus_month" required value="{{ old('bonus_month', now()->format('Y-m')) }}">
+                                @error('bonus_month')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="bonus_amount">Bonus Amount (PKR) <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" class="form-control @error('bonus_amount') is-invalid @enderror"
+                                    id="bonus_amount" name="bonus_amount" required value="{{ old('bonus_amount') }}" min="0">
+                                @error('bonus_amount')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="bonus_notes">Notes</label>
+                                <textarea class="form-control @error('notes') is-invalid @enderror"
+                                    id="bonus_notes" name="notes" rows="2">{{ old('notes') }}</textarea>
+                                @error('notes')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-info btn-block">
+                                    <i class="fas fa-save"></i> Save Monthly Bonus
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
                 <div class="card card-warning">
                     <div class="card-header with-border">
                         <h3 class="card-title">
@@ -290,6 +337,59 @@
                             <div class="alert alert-info">
                                 <i class="fas fa-info-circle"></i>
                                 No leave records found.
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Monthly Bonus History --}}
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card card-secondary">
+                    <div class="card-header with-border">
+                        <h3 class="card-title">
+                            <i class="fas fa-list"></i> Monthly Bonus History
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        @if($employee->salaryBonuses->count() > 0)
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th style="width: 20%">Month</th>
+                                            <th style="width: 20%">Amount</th>
+                                            <th style="width: 45%">Notes</th>
+                                            <th style="width: 15%">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($employee->salaryBonuses as $bonus)
+                                            <tr>
+                                                <td>{{ $bonus->bonus_month->format('F Y') }}</td>
+                                                <td><strong>PKR {{ number_format($bonus->bonus_amount, 2) }}</strong></td>
+                                                <td>{{ $bonus->notes ?? '-' }}</td>
+                                                <td>
+                                                    <form action="{{ route('salary-bonuses.destroy', [$employee, $bonus]) }}"
+                                                        method="POST" style="display:inline;" onsubmit="return confirm('Delete this bonus entry?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-xs btn-danger">
+                                                            <i class="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                No monthly bonus entries found.
                             </div>
                         @endif
                     </div>

@@ -122,6 +122,10 @@
                                 <td class="text-right">PKR {{ number_format($reportData['salary_amount'], 2) }}</td>
                             </tr>
                             <tr>
+                                <td><strong>Bonus:</strong></td>
+                                <td class="text-right">+PKR {{ number_format($reportData['bonus_amount'] ?? 0, 2) }}</td>
+                            </tr>
+                            <tr>
                                 <td><strong>Approved Advances:</strong></td>
                                 <td class="text-right">-PKR {{ number_format($reportData['total_approved_advances'], 2) }}</td>
                             </tr>
@@ -304,11 +308,12 @@
                                         <tr>
                                             <th style="width: 15%">Month</th>
                                             <th style="width: 15%">Salary</th>
+                                            <th style="width: 15%">Bonus</th>
                                             <th style="width: 15%">Advances</th>
                                             <th style="width: 15%">Leave Ded.</th>
-                                            <th style="width: 15%">Net Payable</th>
-                                            <th style="width: 10%">Count</th>
-                                            <th style="width: 15%">Details</th>
+                                            <th style="width: 12%">Net Payable</th>
+                                            <th style="width: 8%">Count</th>
+                                            <th style="width: 10%">Details</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -316,6 +321,11 @@
                                             <tr>
                                                 <td><strong>{{ $history['month'] }}</strong></td>
                                                 <td>PKR {{ number_format($history['salary_amount'], 2) }}</td>
+                                                <td>
+                                                    <span class="badge badge-info">
+                                                        PKR {{ number_format($history['bonus_amount'] ?? 0, 2) }}
+                                                    </span>
+                                                </td>
                                                 <td>
                                                     <span class="badge badge-warning">
                                                         PKR {{ number_format($history['total_advances'], 2) }}

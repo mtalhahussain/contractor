@@ -51,6 +51,7 @@ class SalaryReportController extends Controller
         // Get salary for this month
         $salaryRecord = $this->payrollService->getSalaryForMonth($employee, $year, $month);
         $salaryAmount = $salaryRecord?->salary_amount ?? 0;
+        $bonusAmount = $this->payrollService->getBonusForMonth($employee, $year, $month);
 
         // Get all advances for this month
         $advances = SalaryAdvance::where('employee_id', $employee->id)
@@ -70,7 +71,7 @@ class SalaryReportController extends Controller
         $leaveDeduction = $this->payrollService->calculateLeaveDeduction($employee, $year, $month);
         $leaveDays = $this->payrollService->getLeaveDaysForMonth($employee, $year, $month);
 
-        $remainingBalance = $salaryAmount - $totalApprovedAdvances - $leaveDeduction;
+        $remainingBalance = $salaryAmount + $bonusAmount - $totalApprovedAdvances - $leaveDeduction;
 
         // Get salary log for this month
         $salaryLog = $this->payrollService->getSalaryLog($employee, $year, $month);
@@ -82,15 +83,19 @@ class SalaryReportController extends Controller
             $historyLog = $this->payrollService->getSalaryLog($employee, $historyDate->year, $historyDate->month);
             
             if ($historyLog) {
+                $historyBonus = $this->payrollService->getBonusForMonth($employee, $historyDate->year, $historyDate->month);
+                $historyNetPayable = max(0, $historyLog->salary_amount + $historyBonus - $historyLog->total_advances - ($historyLog->leave_deduction ?? 0));
+
                 $monthsHistory->push([
                     'month' => $historyDate->format('F Y'),
                     'month_short' => $historyDate->format('M Y'),
                     'year' => $historyDate->year,
                     'month_num' => $historyDate->month,
                     'salary_amount' => $historyLog->salary_amount,
+                    'bonus_amount' => $historyBonus,
                     'total_advances' => $historyLog->total_advances,
                     'leave_deduction' => $historyLog->leave_deduction ?? 0,
-                    'net_payable' => $historyLog->net_payable,
+                    'net_payable' => $historyNetPayable,
                     'advance_count' => $historyLog->advance_count,
                 ]);
             }
@@ -103,6 +108,7 @@ class SalaryReportController extends Controller
             'month_year' => $startDate->format('F Y'),
             'salary_record' => $salaryRecord,
             'salary_amount' => $salaryAmount,
+            'bonus_amount' => $bonusAmount,
             'leave_days' => $leaveDays,
             'leave_deduction' => $leaveDeduction,
             'approved_advances' => $approvedAdvances,
@@ -130,6 +136,7 @@ class SalaryReportController extends Controller
         $reportData = $employees->map(function ($employee) use ($year, $month) {
             $salaryRecord = $this->payrollService->getSalaryForMonth($employee, $year, $month);
             $salaryAmount = $salaryRecord?->salary_amount ?? 0;
+            $bonusAmount = $this->payrollService->getBonusForMonth($employee, $year, $month);
 
             $advances = $this->payrollService->getAdvancesForMonth($employee, $year, $month, 'approved');
             $totalAdvances = $advances->sum('advance_amount');
@@ -138,16 +145,18 @@ class SalaryReportController extends Controller
             $leaveDays = $this->payrollService->getLeaveDaysForMonth($employee, $year, $month);
 
             $salaryLog = $this->payrollService->getSalaryLog($employee, $year, $month);
+            $netPayable = max(0, $salaryAmount + $bonusAmount - $totalAdvances - $leaveDeduction);
 
             return [
                 'employee_code' => $employee->employee_code,
                 'employee_name' => $employee->name,
                 'designation' => $employee->designation ?? '-',
                 'salary_amount' => $salaryAmount,
+                'bonus_amount' => $bonusAmount,
                 'total_advances' => $totalAdvances,
                 'leave_days' => $leaveDays,
                 'leave_deduction' => $leaveDeduction,
-                'net_payable' => $salaryLog?->net_payable ?? 0,
+                'net_payable' => $netPayable,
                 'advance_count' => $salaryLog?->advance_count ?? 0,
             ];
         })->filter(function ($item) {

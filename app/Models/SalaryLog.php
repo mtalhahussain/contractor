@@ -14,6 +14,7 @@ class SalaryLog extends Model
         'employee_id',
         'log_date',
         'salary_amount',
+        'bonus_amount',
         'total_advances',
         'leave_deduction',
         'net_payable',
@@ -26,6 +27,7 @@ class SalaryLog extends Model
         return [
             'log_date' => 'date',
             'salary_amount' => 'decimal:2',
+            'bonus_amount' => 'decimal:2',
             'total_advances' => 'decimal:2',
             'leave_deduction' => 'decimal:2',
             'net_payable' => 'decimal:2',

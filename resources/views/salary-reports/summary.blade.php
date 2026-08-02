@@ -57,7 +57,7 @@
 
     {{-- Summary Cards --}}
     <div class="row mt-3">
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <div class="info-box">
                 <span class="info-box-icon bg-success"><i class="fas fa-money-bill-wave"></i></span>
                 <div class="info-box-content">
@@ -69,7 +69,19 @@
             </div>
         </div>
 
-        <div class="col-sm-4">
+        <div class="col-sm-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-info"><i class="fas fa-gift"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Total Bonus</span>
+                    <span class="info-box-number">
+                        PKR {{ number_format($reportData->sum('bonus_amount'), 2) }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
             <div class="info-box">
                 <span class="info-box-icon bg-warning"><i class="fas fa-minus-circle"></i></span>
                 <div class="info-box-content">
@@ -81,9 +93,9 @@
             </div>
         </div>
 
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <div class="info-box">
-                <span class="info-box-icon bg-info"><i class="fas fa-balance-scale"></i></span>
+                <span class="info-box-icon bg-primary"><i class="fas fa-balance-scale"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Net Payable</span>
                     <span class="info-box-number">
@@ -113,6 +125,7 @@
                                         <th style="width: 15%">Employee Name</th>
                                         <th style="width: 12%">Designation</th>
                                         <th style="width: 12%">Salary</th>
+                                            <th style="width: 12%">Bonus</th>
                                         <th style="width: 12%">Advances</th>
                                         <th style="width: 12%">Leave Ded.</th>
                                         <th style="width: 12%">Net Payable</th>
@@ -130,6 +143,11 @@
                                             <td>{{ $data['designation'] }}</td>
                                             <td>
                                                 <strong>PKR {{ number_format($data['salary_amount'], 2) }}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-info">
+                                                    PKR {{ number_format($data['bonus_amount'] ?? 0, 2) }}
+                                                </span>
                                             </td>
                                             <td>
                                                 <span class="badge badge-warning">
@@ -159,6 +177,7 @@
                                     <tr class="table-primary" style="font-weight: bold;">
                                         <td colspan="3">TOTAL</td>
                                         <td>PKR {{ number_format($totalSalary, 2) }}</td>
+                                        <td>PKR {{ number_format($reportData->sum('bonus_amount'), 2) }}</td>
                                         <td>PKR {{ number_format($totalAdvances, 2) }}</td>
                                         <td>PKR {{ number_format($reportData->sum('leave_deduction'), 2) }}</td>
                                         <td>PKR {{ number_format($totalNetPayable, 2) }}</td>
@@ -203,6 +222,7 @@
             $('#employee_filter').on('change', function() {
                 let filter = $(this).val().toLowerCase();
                 let totalSalary = 0;
+                let totalBonus = 0;
                 let totalAdvances = 0;
                 let totalNetPayable = 0;
 
@@ -213,8 +233,9 @@
                         $(this).show();
                         if (!$(this).hasClass('table-primary')) {
                             totalSalary += parseFloat($(this).find('td:eq(3)').text().replace(/[^\d.-]/g, '')) || 0;
-                            totalAdvances += parseFloat($(this).find('td:eq(4)').text().replace(/[^\d.-]/g, '')) || 0;
-                            totalNetPayable += parseFloat($(this).find('td:eq(5)').text().replace(/[^\d.-]/g, '')) || 0;
+                            totalBonus += parseFloat($(this).find('td:eq(4)').text().replace(/[^\d.-]/g, '')) || 0;
+                            totalAdvances += parseFloat($(this).find('td:eq(5)').text().replace(/[^\d.-]/g, '')) || 0;
+                            totalNetPayable += parseFloat($(this).find('td:eq(7)').text().replace(/[^\d.-]/g, '')) || 0;
                         }
                     } else {
                         $(this).hide();
@@ -227,8 +248,9 @@
                     totalsRow.show();
                 } else {
                     totalsRow.find('td:eq(3)').text('PKR ' + totalSalary.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
-                    totalsRow.find('td:eq(4)').text('PKR ' + totalAdvances.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
-                    totalsRow.find('td:eq(5)').text('PKR ' + totalNetPayable.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+                    totalsRow.find('td:eq(4)').text('PKR ' + totalBonus.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+                    totalsRow.find('td:eq(5)').text('PKR ' + totalAdvances.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+                    totalsRow.find('td:eq(7)').text('PKR ' + totalNetPayable.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
                     totalsRow.show();
                 }
             });

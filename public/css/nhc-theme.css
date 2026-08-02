@@ -163,6 +163,28 @@ h6 {
     border-top-right-radius: var(--nhc-radius-xl) !important;
 }
 
+.alert.alert-success {
+    color: #155724 !important;
+    background-color: #d4edda !important;
+    border-color: #c3e6cb !important;
+}
+
+.alert.alert-success .close,
+.alert.alert-success .icon {
+    color: #155724 !important;
+}
+
+.alert.alert-info {
+    color: #0c5460 !important;
+    background-color: #d1ecf1 !important;
+    border-color: #bee5eb !important;
+}
+
+.alert.alert-info .close,
+.alert.alert-info .icon {
+    color: #0c5460 !important;
+}
+
 .small-box .inner h3,
 .small-box .inner h4 {
     font-weight: 700 !important;

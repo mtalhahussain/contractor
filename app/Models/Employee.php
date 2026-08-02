@@ -81,6 +81,11 @@ class Employee extends Model
         return $this->hasMany(SalaryLog::class)->orderByDesc('log_date');
     }
 
+    public function salaryBonuses(): HasMany
+    {
+        return $this->hasMany(SalaryBonus::class)->orderByDesc('bonus_month');
+    }
+
     public function leaves(): HasMany
     {
         return $this->hasMany(EmployeeLeave::class)->orderByDesc('leave_date');

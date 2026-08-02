@@ -19,6 +19,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SalaryAdvanceController;
+use App\Http\Controllers\SalaryBonusController;
 use App\Http\Controllers\SalaryHistoryController;
 use App\Http\Controllers\SalaryReportController;
 use App\Http\Controllers\SiteController;
@@ -45,6 +46,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/employees/{employee}/salary-advances/{advance}/reject', [SalaryAdvanceController::class, 'reject'])->name('salary-advances.reject');
     Route::delete('/employees/{employee}/salary-advances/{advance}', [SalaryAdvanceController::class, 'destroy'])->name('salary-advances.destroy');
     Route::get('/employees/{employee}/salary-advances', [SalaryAdvanceController::class, 'getAdvances'])->name('salary-advances.get-advances');
+    Route::post('/employees/{employee}/salary-bonuses', [SalaryBonusController::class, 'store'])->name('salary-bonuses.store');
+    Route::delete('/employees/{employee}/salary-bonuses/{salaryBonus}', [SalaryBonusController::class, 'destroy'])->name('salary-bonuses.destroy');
 
     // Employee Leave Management
     Route::post('/employees/{employee}/leaves', [EmployeeLeaveController::class, 'store'])->name('employee-leaves.store');

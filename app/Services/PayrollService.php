@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Employee;
 use App\Models\SalaryHistory;
 use App\Models\SalaryAdvance;
+use App\Models\SalaryBonus;
 use App\Models\SalaryLog;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -151,6 +152,7 @@ class PayrollService
 
         $salaryRecord = $this->getSalaryForMonth($employee, $year, $month);
         $salaryAmount = $salaryRecord?->salary_amount ?? 0;
+        $bonusAmount = $this->getBonusForMonth($employee, $year, $month);
 
         // Get all approved advances for this month
         $advances = $this->getAdvancesForMonth($employee, $year, $month, 'approved');
@@ -159,8 +161,8 @@ class PayrollService
         // Calculate leave deduction
         $leaveDeduction = $this->calculateLeaveDeduction($employee, $year, $month);
 
-        // Net payable = salary - advances - leave_deduction
-        $netPayable = $salaryAmount - $totalAdvances - $leaveDeduction;
+        // Net payable = salary + bonus - advances - leave_deduction
+        $netPayable = $salaryAmount + $bonusAmount - $totalAdvances - $leaveDeduction;
 
         return SalaryLog::updateOrCreate(
             [
@@ -169,6 +171,7 @@ class PayrollService
             ],
             [
                 'salary_amount' => $salaryAmount,
+                'bonus_amount' => $bonusAmount,
                 'total_advances' => $totalAdvances,
                 'leave_deduction' => $leaveDeduction,
                 'net_payable' => max(0, $netPayable),
@@ -187,6 +190,18 @@ class PayrollService
         return SalaryLog::where('employee_id', $employee->id)
             ->where('log_date', $logDate)
             ->first();
+    }
+
+    /**
+     * Get total bonus for a specific month.
+     */
+    public function getBonusForMonth(Employee $employee, $year, $month): float
+    {
+        $bonusMonth = Carbon::createFromDate($year, $month, 1)->format('Y-m-d');
+
+        return (float) SalaryBonus::where('employee_id', $employee->id)
+            ->whereDate('bonus_month', $bonusMonth)
+            ->sum('bonus_amount');
     }
 
     /**
@@ -237,12 +252,16 @@ class PayrollService
             ->orderByDesc('effective_from')
             ->get()
             ->map(function ($salary) {
+                $year = $salary->effective_from->year;
+                $month = $salary->effective_from->month;
+
                 return [
                     'id' => $salary->id,
                     'employee_id' => $salary->employee_id,
                     'effective_from' => $salary->effective_from,
                     'month_year' => $salary->effective_from->format('F Y'),
                     'salary_amount' => $salary->salary_amount,
+                    'bonus_amount' => $this->getBonusForMonth($salary->employee, $year, $month),
                     'salary_type' => $salary->salary_type,
                     'total_advances' => $salary->salaryAdvances->sum('advance_amount'),
                     'advances_count' => $salary->salaryAdvances->count(),

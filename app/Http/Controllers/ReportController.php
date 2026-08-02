@@ -46,7 +46,7 @@ class ReportController extends Controller
             ->with('machine')
             ->whereBetween('date', [$from, $to])
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
-            ->orderBy('date')
+            ->orderByDesc('date')
             ->get();
 
         $rows = $entries->map(function ($entry) use ($rateResolver) {
@@ -84,7 +84,7 @@ class ReportController extends Controller
             ->with('machine')
             ->whereBetween('date', [$from, $to])
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
-            ->orderBy('date')
+            ->orderByDesc('date')
             ->get();
 
         $rows = $entries->map(function ($entry) use ($rateResolver) {
@@ -300,6 +300,8 @@ class ReportController extends Controller
             $period->addDay();
         }
 
+        $rows = $rows->sortByDesc('date')->values();
+
         return view('reports.daily-summary', compact('rows', 'from', 'to'));
     }
 
@@ -377,7 +379,7 @@ class ReportController extends Controller
             $months->put($month, $row);
         }
 
-        $rows = $months->values()->sortBy('month')->map(function ($row) {
+        $rows = $months->values()->sortByDesc('month')->map(function ($row) {
             $row['balance'] = $row['total_earning'] - $row['cost'] - $row['payments'] - $row['expenses'];
 
             return $row;
@@ -420,7 +422,7 @@ class ReportController extends Controller
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
             ->when($request->filled('spare_part_id'), fn ($query) => $query->where('spare_part_id', $request->spare_part_id))
             ->when($request->filled('usage_type'), fn ($query) => $query->where('usage_type', $request->usage_type))
-            ->orderBy('date')
+            ->orderByDesc('date')
             ->get();
 
         $rows = $entries->map(fn ($entry) => [
@@ -509,7 +511,7 @@ class ReportController extends Controller
             ->when($request->filled('fuel_stock_id'), fn ($query) => $query->where('fuel_stock_id', $request->fuel_stock_id))
             ->when($request->filled('consumer_type'), fn ($query) => $query->where('consumer_type', $request->consumer_type))
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
-            ->orderBy('date')
+            ->orderByDesc('date')
             ->get();
 
         $rows = $entries->map(fn ($entry) => [
@@ -602,10 +604,25 @@ class ReportController extends Controller
 
     private function dateRange(Request $request): array
     {
-        $from = $request->input('from', Carbon::now()->startOfMonth()->toDateString());
-        $to = $request->input('to', Carbon::now()->toDateString());
+        $fromInput = $request->input('from');
+        $toInput = $request->input('to');
 
-        return [$from, $to];
+        if ($fromInput && !$toInput) {
+            $toInput = $fromInput;
+        }
+
+        if (!$fromInput && $toInput) {
+            $fromInput = $toInput;
+        }
+
+        $from = Carbon::parse($fromInput ?: Carbon::now()->startOfMonth()->toDateString());
+        $to = Carbon::parse($toInput ?: Carbon::now()->toDateString());
+
+        if ($from->gt($to)) {
+            [$from, $to] = [$to, $from];
+        }
+
+        return [$from->toDateString(), $to->toDateString()];
     }
 
     private function selectedSiteId(Request $request): ?int
@@ -669,7 +686,7 @@ class ReportController extends Controller
             ->with('machine')
             ->whereBetween('date', [$from, $to])
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
-            ->orderBy('date')
+            ->orderByDesc('date')
             ->get()
             ->map(fn ($entry) => [
                 'date' => $entry->date->format('Y-m-d'),
@@ -693,7 +710,7 @@ class ReportController extends Controller
             ->with('machine')
             ->whereBetween('date', [$from, $to])
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
-            ->orderBy('date')
+            ->orderByDesc('date')
             ->get()
             ->map(fn ($entry) => [
                 'date' => $entry->date->format('Y-m-d'),
@@ -853,7 +870,7 @@ class ReportController extends Controller
             $period->addDay();
         }
 
-        return $rows;
+        return $rows->sortByDesc('date')->values();
     }
 
     private function monthlySummaryData(Request $request, RateResolverService $rateResolver): Collection
@@ -880,7 +897,7 @@ class ReportController extends Controller
             $rows->put($month, $row);
         }
 
-        return $rows->values()->sortBy('month')->values();
+        return $rows->values()->sortByDesc('month')->values();
     }
 
     private function inventoryStockData(Request $request): Collection
@@ -910,7 +927,7 @@ class ReportController extends Controller
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
             ->when($request->filled('spare_part_id'), fn ($query) => $query->where('spare_part_id', $request->spare_part_id))
             ->when($request->filled('usage_type'), fn ($query) => $query->where('usage_type', $request->usage_type))
-            ->orderBy('date')
+            ->orderByDesc('date')
             ->get()
             ->map(fn ($entry) => [
                 'date' => $entry->date->format('Y-m-d'),
@@ -975,7 +992,7 @@ class ReportController extends Controller
             ->when($request->filled('fuel_stock_id'), fn ($query) => $query->where('fuel_stock_id', $request->fuel_stock_id))
             ->when($request->filled('consumer_type'), fn ($query) => $query->where('consumer_type', $request->consumer_type))
             ->when($request->filled('machine_id'), fn ($query) => $query->where('machine_id', $request->machine_id))
-            ->orderBy('date')
+            ->orderByDesc('date')
             ->get()
             ->map(fn ($entry) => [
                 'date' => $entry->date->format('Y-m-d'),
