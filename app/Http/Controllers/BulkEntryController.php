@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DieselUsageEntry;
 use App\Models\Machine;
 use App\Models\MachineHourEntry;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -34,14 +35,38 @@ class BulkEntryController extends Controller
                 continue;
             }
 
-            MachineHourEntry::updateOrCreate(
-                ['date' => $validated['date'], 'machine_id' => $machineId],
-                [
-                    'working_hours' => $hours,
-                    'remarks' => $validated['remarks'][$machineId] ?? null,
-                    'created_by' => $request->user()?->id,
-                ]
-            );
+            $attributes = [
+                'working_hours' => $hours,
+                'remarks' => $validated['remarks'][$machineId] ?? null,
+                'created_by' => $request->user()?->id,
+            ];
+
+            try {
+                MachineHourEntry::updateOrCreate(
+                    ['date' => $validated['date'], 'machine_id' => $machineId],
+                    $attributes
+                );
+            } catch (QueryException $exception) {
+                if (! $this->isMachineHoursUniqueViolation($exception)) {
+                    throw $exception;
+                }
+
+                $existingEntry = MachineHourEntry::withTrashed()
+                    ->whereDate('date', $validated['date'])
+                    ->where('machine_id', $machineId)
+                    ->first();
+
+                if (! $existingEntry) {
+                    throw $exception;
+                }
+
+                if ($existingEntry->trashed()) {
+                    $existingEntry->restore();
+                }
+
+                $existingEntry->update($attributes);
+            }
+
             $savedCount++;
         }
 
@@ -83,5 +108,14 @@ class BulkEntryController extends Controller
         }
 
         return redirect()->route('bulk.diesel.form')->with('success', "Saved {$savedCount} diesel entries.");
+    }
+
+    private function isMachineHoursUniqueViolation(QueryException $exception): bool
+    {
+        return (string) $exception->getCode() === '23000'
+            && str_contains(
+                strtolower($exception->getMessage()),
+                'machine_hour_entries_date_machine_id_unique'
+            );
     }
 }
