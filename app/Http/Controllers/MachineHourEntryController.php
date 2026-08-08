@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Machine;
 use App\Models\MachineHourEntry;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\Rule;
@@ -32,14 +33,27 @@ class MachineHourEntryController extends Controller
             'machine_id' => [
                 'required',
                 'exists:machines,id',
-                Rule::unique('machine_hour_entries')->where(fn ($query) => $query->where('date', $request->date)),
+                Rule::unique('machine_hour_entries')->where(fn ($query) => $query->whereDate('date', $request->input('date'))),
             ],
             'working_hours' => ['required', 'numeric', 'min:0'],
             'remarks' => ['nullable', 'string'],
         ]);
 
         $validated['created_by'] = $request->user()?->id;
-        MachineHourEntry::create($validated);
+
+        try {
+            MachineHourEntry::create($validated);
+        } catch (QueryException $exception) {
+            if (! $this->isMachineHoursUniqueViolation($exception)) {
+                throw $exception;
+            }
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'machine_id' => 'An entry for this machine and date already exists. Please edit the existing record instead.',
+                ]);
+        }
 
         return redirect()->route('machine-hours.index')->with('success', 'Machine hours saved.');
     }
@@ -66,13 +80,27 @@ class MachineHourEntryController extends Controller
             'machine_id' => [
                 'required',
                 'exists:machines,id',
-                Rule::unique('machine_hour_entries')->ignore($machine_hour->id)->where(fn ($query) => $query->where('date', $request->date)),
+                Rule::unique('machine_hour_entries')
+                    ->ignore($machine_hour->id)
+                    ->where(fn ($query) => $query->whereDate('date', $request->input('date'))),
             ],
             'working_hours' => ['required', 'numeric', 'min:0'],
             'remarks' => ['nullable', 'string'],
         ]);
 
-        $machine_hour->update($validated);
+        try {
+            $machine_hour->update($validated);
+        } catch (QueryException $exception) {
+            if (! $this->isMachineHoursUniqueViolation($exception)) {
+                throw $exception;
+            }
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'machine_id' => 'An entry for this machine and date already exists. Please choose another machine/date.',
+                ]);
+        }
 
         return redirect()->route('machine-hours.index')->with('success', 'Machine hours updated.');
     }
@@ -82,5 +110,14 @@ class MachineHourEntryController extends Controller
         $machine_hour->delete();
 
         return redirect()->route('machine-hours.index')->with('success', 'Machine hours deleted.');
+    }
+
+    private function isMachineHoursUniqueViolation(QueryException $exception): bool
+    {
+        return (string) $exception->getCode() === '23000'
+            && str_contains(
+                strtolower($exception->getMessage()),
+                'machine_hour_entries_date_machine_id_unique'
+            );
     }
 }
