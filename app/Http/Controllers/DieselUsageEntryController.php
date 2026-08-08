@@ -10,11 +10,30 @@ use Illuminate\View\View;
 
 class DieselUsageEntryController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $entries = DieselUsageEntry::query()->with('machine')->latest('date')->paginate(30);
+        $selectedMachineId = $request->integer('machine_id') ?: null;
+        $selectedMonth = $request->input('month');
 
-        return view('diesel-usage.index', compact('entries'));
+        $entries = DieselUsageEntry::query()
+            ->with('machine')
+            ->when($selectedMachineId, fn ($query) => $query->where('machine_id', $selectedMachineId))
+            ->when(
+                is_string($selectedMonth) && preg_match('/^\d{4}-\d{2}$/', $selectedMonth),
+                function ($query) use ($selectedMonth) {
+                    [$year, $month] = explode('-', $selectedMonth);
+
+                    $query->whereYear('date', (int) $year)
+                        ->whereMonth('date', (int) $month);
+                }
+            )
+            ->latest('date')
+            ->paginate(30)
+            ->withQueryString();
+
+        $machines = Machine::query()->orderBy('name')->get(['id', 'name']);
+
+        return view('diesel-usage.index', compact('entries', 'machines', 'selectedMachineId', 'selectedMonth'));
     }
 
     public function create(): View
