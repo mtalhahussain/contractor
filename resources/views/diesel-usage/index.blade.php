@@ -17,7 +17,7 @@
     <tbody>
     @foreach($entries as $entry)
         <tr>
-            <td>{{ $entry->date->format('Y-m-d') }}</td>
+            <td>{{ $entry->date->format('d-M-y') }}</td>
             <td>{{ $entry->machine?->name }}</td>
             <td>{{ number_format($entry->diesel_liters, 2) }}</td>
             <td>{{ $entry->remarks }}</td>

@@ -12,5 +12,5 @@
     </div>
 </form>
 <div class="mb-2"><a class="btn btn-sm btn-success" href="{{ route('reports.export', ['report' => 'diesel-usage', 'format' => 'excel'] + request()->query()) }}">Excel</a> <a class="btn btn-sm btn-danger" href="{{ route('reports.export', ['report' => 'diesel-usage', 'format' => 'pdf'] + request()->query()) }}">PDF</a></div>
-<div class="card"><div class="card-body table-responsive p-0"><table class="table table-striped"><thead><tr><th>Date</th><th>Machine</th><th>Liters</th><th>Diesel Rate</th><th>Cost</th></tr></thead><tbody>@foreach($rows as $row)<tr><td>{{ $row['date'] }}</td><td>{{ $row['machine'] }}</td><td>{{ number_format($row['liters'], 2) }}</td><td>{{ number_format($row['diesel_rate'], 2) }}</td><td>{{ number_format($row['cost'], 2) }}</td></tr>@endforeach</tbody></table></div></div>
+<div class="card"><div class="card-body table-responsive p-0"><table class="table table-striped"><thead><tr><th>Date</th><th>Machine</th><th>Liters</th><th>Diesel Rate</th><th>Cost</th></tr></thead><tbody>@foreach($rows as $row)<tr><td>{{ \Carbon\Carbon::parse($row['date'])->format('d-M-y') }}</td><td>{{ $row['machine'] }}</td><td>{{ number_format($row['liters'], 2) }}</td><td>{{ number_format($row['diesel_rate'], 2) }}</td><td>{{ number_format($row['cost'], 2) }}</td></tr>@endforeach</tbody></table></div></div>
 @stop

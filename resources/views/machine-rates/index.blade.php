@@ -19,7 +19,7 @@
                     <tr>
                         <td>{{ $rate->machine?->name }}</td>
                         <td>{{ number_format($rate->hourly_rate, 2) }}</td>
-                        <td>{{ $rate->effective_from_date->format('Y-m-d') }}</td>
+                        <td>{{ $rate->effective_from_date->format('d-M-y') }}</td>
                         <td>
                             <form action="{{ route('machine-rates.destroy', $rate) }}" method="POST">
                                 @csrf @method('DELETE')

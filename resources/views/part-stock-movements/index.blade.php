@@ -21,7 +21,7 @@
     <tbody>
     @foreach($movements as $movement)
         <tr>
-            <td>{{ $movement->date->format('Y-m-d') }}</td>
+            <td>{{ $movement->date->format('d-M-y') }}</td>
             <td>{{ $movement->sparePart?->name }}</td>
             <td>
                 @if ($movement->movement_type === 'usage')

@@ -21,7 +21,7 @@
     <tbody>
     @foreach($entries as $entry)
         <tr>
-            <td>{{ $entry->date->format('Y-m-d') }}</td>
+            <td>{{ $entry->date->format('d-M-y') }}</td>
             <td>{{ $entry->machine?->name }}</td>
             <td>{{ $entry->sparePart?->name }}</td>
             <td>{{ ucfirst($entry->usage_type) }}</td>
