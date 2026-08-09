@@ -14,12 +14,16 @@ use Illuminate\View\View;
 
 class MachineController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $machines = Machine::query()
             ->with(['currentSiteAssignment.site'])
+            ->when($request->filled('q'), fn ($q) => $q->where(fn ($i) => $i->where('name', 'like', '%'.$request->q.'%')->orWhere('machine_code', 'like', '%'.$request->q.'%')))
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))
             ->latest()
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return view('machines.index', compact('machines'));
     }

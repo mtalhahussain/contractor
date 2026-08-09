@@ -110,6 +110,7 @@
                 border-radius: 10px;
                 padding: 11px 14px;
                 width: 100%;
+                box-sizing: border-box;
                 font-size: 0.92rem;
                 color: #1e293b;
                 transition: border-color 0.2s, box-shadow 0.2s;
@@ -176,27 +177,58 @@
 
             @media (max-width: 767px) {
                 .brand-panel { display: none !important; }
+
+                .auth-shell {
+                    flex-direction: column;
+                }
+
                 .auth-card {
                     border-radius: 0;
                     min-height: 100vh;
+                    width: 100%;
                 }
 
                 .auth-card-wrap {
+                    width: 100%;
                     max-width: 100%;
                     min-height: 100vh;
-                    justify-content: flex-start;
-                    padding: 1.5rem 1rem;
+                    justify-content: center;
+                    padding: 2rem 1.25rem;
+                    box-sizing: border-box;
                 }
 
                 .auth-content {
+                    width: 100%;
                     max-width: 100%;
+                    box-sizing: border-box;
+                }
+
+                .input-field {
+                    width: 100%;
+                    box-sizing: border-box;
+                    font-size: 1rem;
+                    padding: 13px 14px;
+                }
+
+                .login-form {
+                    width: 100%;
+                }
+
+                .remember-row {
+                    flex-wrap: wrap;
+                    gap: 10px;
+                }
+
+                .btn-login {
+                    padding: 14px 24px;
+                    font-size: 1rem;
                 }
 
                 .mobile-login-logo {
                     display: flex;
                     width: 100%;
                     justify-content: center;
-                    margin: 0 0 1rem;
+                    margin: 0 0 1.5rem;
                 }
 
                 .divider-line {
@@ -206,7 +238,11 @@
 
             @media (max-width: 400px) {
                 .auth-card-wrap {
-                    padding: 1rem 0.75rem;
+                    padding: 1.5rem 1rem;
+                }
+
+                .input-field {
+                    font-size: 0.95rem;
                 }
             }
         </style>

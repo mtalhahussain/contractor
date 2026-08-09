@@ -12,6 +12,29 @@
 @section('content')
 @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 @if (session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
+<form method="GET" class="card card-body mb-3 p-3">
+    <div class="form-row align-items-end">
+        <div class="col-md-5">
+            <label class="mb-1 small font-weight-bold">Machine</label>
+            <select name="machine_id" class="form-control form-control-sm">
+                <option value="">All Machines</option>
+                @foreach($machines as $m)
+                    <option value="{{ $m->id }}" {{ request('machine_id') == $m->id ? 'selected' : '' }}>{{ $m->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="mb-1 small font-weight-bold">Month</label>
+            <input type="month" name="month" class="form-control form-control-sm" value="{{ request('month') }}">
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary btn-sm btn-block">Filter</button>
+            @if(request()->anyFilled(['machine_id','month']))
+                <a href="{{ route('machine-part-usages.index') }}" class="btn btn-secondary btn-sm btn-block mt-1">Clear</a>
+            @endif
+        </div>
+    </div>
+</form>
 <div class="alert alert-info">
     <strong>Tip:</strong> Add usage when a part is consumed on a machine. Stock balance will be reduced automatically and reflected in movement history.
 </div>

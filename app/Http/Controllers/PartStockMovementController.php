@@ -16,15 +16,19 @@ class PartStockMovementController extends Controller
     {
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        $spareParts = SparePart::query()->orderBy('name')->get(['id', 'name']);
         $movements = PartStockMovement::query()
             ->with(['sparePart', 'machine', 'usage'])
-            ->latest('date')
-            ->latest('id')
-            ->paginate(30);
+            ->when($request->filled('spare_part_id'), fn ($q) => $q->where('spare_part_id', $request->spare_part_id))
+            ->when($request->filled('month') && preg_match('/^\d{4}-\d{2}$/', (string) $request->month), function ($q) use ($request) {
+                [$y, $m] = explode('-', $request->month);
+                $q->whereYear('date', $y)->whereMonth('date', $m);
+            })
+            ->latest('date')->latest('id')->paginate(30)->withQueryString();
 
-        return view('part-stock-movements.index', compact('movements'));
+        return view('part-stock-movements.index', compact('movements', 'spareParts'));
     }
 
     public function create(): View

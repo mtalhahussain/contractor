@@ -12,6 +12,38 @@
 @section('content')
     @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
+    <form method="GET" class="card card-body mb-3 p-3">
+        <div class="form-row align-items-end">
+            <div class="col-md-4">
+                <label class="mb-1 small font-weight-bold">Search</label>
+                <input type="text" name="q" class="form-control form-control-sm" value="{{ request('q') }}" placeholder="Machine name or code">
+            </div>
+            <div class="col-md-3">
+                <label class="mb-1 small font-weight-bold">Type</label>
+                <select name="type" class="form-control form-control-sm">
+                    <option value="">All Types</option>
+                    @foreach(['Excavator','Dozer','Roller','Grader','Water Tanker','Hilux','Dumper'] as $t)
+                        <option value="{{ $t }}" {{ request('type') === $t ? 'selected' : '' }}>{{ $t }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="mb-1 small font-weight-bold">Status</label>
+                <select name="status" class="form-control form-control-sm">
+                    <option value="">All</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-primary btn-sm btn-block">Filter</button>
+                @if(request()->anyFilled(['q','type','status']))
+                    <a href="{{ route('machines.index') }}" class="btn btn-secondary btn-sm btn-block mt-1">Clear</a>
+                @endif
+            </div>
+        </div>
+    </form>
+
     <div class="card">
         <div class="card-body table-responsive p-0">
             <table class="table table-striped mb-0">

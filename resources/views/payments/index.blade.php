@@ -5,6 +5,29 @@
 @stop
 @section('content')
 @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+<form method="GET" class="card card-body mb-3 p-3">
+    <div class="form-row align-items-end">
+        <div class="col-md-4">
+            <label class="mb-1 small font-weight-bold">Machine</label>
+            <select name="machine_id" class="form-control form-control-sm">
+                <option value="">All Machines</option>
+                @foreach($machines as $m)
+                    <option value="{{ $m->id }}" {{ request('machine_id') == $m->id ? 'selected' : '' }}>{{ $m->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="mb-1 small font-weight-bold">Month</label>
+            <input type="month" name="month" class="form-control form-control-sm" value="{{ request('month') }}">
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-primary btn-sm btn-block">Filter</button>
+            @if(request()->anyFilled(['machine_id','month']))
+                <a href="{{ route('payments.index') }}" class="btn btn-secondary btn-sm btn-block mt-1">Clear</a>
+            @endif
+        </div>
+    </div>
+</form>
 <div class="card"><div class="card-body table-responsive p-0"><table class="table table-striped mb-0"><thead><tr><th>Date</th><th>Machine</th><th>Party</th><th>Amount</th><th>Method</th><th>Action</th></tr></thead><tbody>@foreach($payments as $payment)<tr><td>{{ $payment->date->format('d-M-y') }}</td><td>{{ $payment->machine?->name }}</td><td>{{ $payment->party_name }}</td><td>{{ number_format($payment->amount_received, 2) }}</td><td>{{ $payment->payment_method }}</td><td><a class="btn btn-sm btn-info" href="{{ route('payments.edit', $payment) }}">Edit</a> <form class="d-inline" action="{{ route('payments.destroy', $payment) }}" method="POST">@csrf @method('DELETE')<button class="btn btn-sm btn-danger" onclick="return confirm('Delete payment?')">Delete</button></form></td></tr>@endforeach</tbody></table></div></div>
 {{ $payments->links() }}
 @stop

@@ -12,6 +12,29 @@
 @section('content')
 @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 @if (session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
+<form method="GET" class="card card-body mb-3 p-3">
+    <div class="form-row align-items-end">
+        <div class="col-md-5">
+            <label class="mb-1 small font-weight-bold">Spare Part</label>
+            <select name="spare_part_id" class="form-control form-control-sm">
+                <option value="">All Parts</option>
+                @foreach($spareParts as $p)
+                    <option value="{{ $p->id }}" {{ request('spare_part_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="mb-1 small font-weight-bold">Month</label>
+            <input type="month" name="month" class="form-control form-control-sm" value="{{ request('month') }}">
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary btn-sm btn-block">Filter</button>
+            @if(request()->anyFilled(['spare_part_id','month']))
+                <a href="{{ route('part-stock-movements.index') }}" class="btn btn-secondary btn-sm btn-block mt-1">Clear</a>
+            @endif
+        </div>
+    </div>
+</form>
 <div class="alert alert-info">
     <strong>Tip:</strong> Use <em>Stock In</em> when new parts arrive and <em>Stock Out</em> for manual deductions. For machine jobs, prefer <em>Machine Part Usage</em> so stock updates automatically.
 </div>

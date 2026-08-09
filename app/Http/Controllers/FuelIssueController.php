@@ -16,15 +16,19 @@ class FuelIssueController extends Controller
     {
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        $machines = Machine::query()->orderBy('name')->get(['id', 'name']);
         $issues = FuelIssue::query()
             ->with(['fuelStock', 'machine'])
-            ->latest('date')
-            ->latest('id')
-            ->paginate(30);
+            ->when($request->filled('machine_id'), fn ($q) => $q->where('machine_id', $request->machine_id))
+            ->when($request->filled('month') && preg_match('/^\d{4}-\d{2}$/', (string) $request->month), function ($q) use ($request) {
+                [$y, $m] = explode('-', $request->month);
+                $q->whereYear('date', $y)->whereMonth('date', $m);
+            })
+            ->latest('date')->latest('id')->paginate(30)->withQueryString();
 
-        return view('fuel-issues.index', compact('issues'));
+        return view('fuel-issues.index', compact('issues', 'machines'));
     }
 
     public function create(): View

@@ -1,89 +1,56 @@
-@php( $logout_url = View::getSection('logout_url') ?? config('adminlte.logout_url', 'logout') )
-@php( $profile_url = View::getSection('profile_url') ?? config('adminlte.profile_url', 'logout') )
+<li class="nav-item" style="position:relative;">
 
-@if (config('adminlte.usermenu_profile_url', false))
-    @php( $profile_url = Auth::user()->adminlte_profile_url() )
-@endif
-
-@if (config('adminlte.use_route_url', false))
-    @php( $profile_url = $profile_url ? route($profile_url) : '' )
-    @php( $logout_url = $logout_url ? route($logout_url) : '' )
-@else
-    @php( $profile_url = $profile_url ? url($profile_url) : '' )
-    @php( $logout_url = $logout_url ? url($logout_url) : '' )
-@endif
-
-<li class="nav-item dropdown user-menu">
-
-    {{-- User menu toggler --}}
-    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
-        @if(config('adminlte.usermenu_image'))
-            <img src="{{ Auth::user()->adminlte_image() }}"
-                 class="user-image img-circle elevation-2"
-                 alt="{{ Auth::user()->name }}">
-        @endif
-        <span @if(config('adminlte.usermenu_image')) class="d-none d-md-inline" @endif>
-            {{ Auth::user()->name }}
-        </span>
+    <a href="#" class="nav-link" id="nhcUserBtn" onclick="nhcToggleMenu(event)">
+        <i class="fas fa-user-circle fa-lg"></i>
+        <span class="d-none d-md-inline ml-1">{{ Auth::user()->name }}</span>
+        <i class="fas fa-caret-down ml-1"></i>
     </a>
 
-    {{-- User menu dropdown --}}
-    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-
-        {{-- User menu header --}}
-        @if(!View::hasSection('usermenu_header') && config('adminlte.usermenu_header'))
-            <li class="user-header {{ config('adminlte.usermenu_header_class', 'bg-primary') }}
-                @if(!config('adminlte.usermenu_image')) h-auto @endif">
-                @if(config('adminlte.usermenu_image'))
-                    <img src="{{ Auth::user()->adminlte_image() }}"
-                         class="img-circle elevation-2"
-                         alt="{{ Auth::user()->name }}">
-                @endif
-                <p class="@if(!config('adminlte.usermenu_image')) mt-0 @endif">
-                    {{ Auth::user()->name }}
-                    @if(config('adminlte.usermenu_desc'))
-                        <small>{{ Auth::user()->adminlte_desc() }}</small>
-                    @endif
-                </p>
-            </li>
-        @else
-            @yield('usermenu_header')
-        @endif
-
-        {{-- Configured user menu links --}}
-        @each('adminlte::partials.navbar.dropdown-item', $adminlte->menu("navbar-user"), 'item')
-
-        {{-- User menu body --}}
-        @hasSection('usermenu_body')
-            <li class="user-body">
-                @yield('usermenu_body')
-            </li>
-        @endif
-
-        {{-- User menu footer --}}
-        <li class="user-footer d-flex align-items-center justify-content-between">
-            @if($profile_url)
-                <a href="{{ $profile_url }}" class="btn btn-outline-secondary btn-sm px-3">
-                    <i class="fa fa-fw fa-user text-primary"></i>
-                    {{ __('adminlte::menu.profile') }}
-                </a>
-            @endif
-
-            <a class="btn btn-danger btn-sm px-3 @if(!$profile_url) btn-block @endif"
-               href="#"
-               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                <i class="fa fa-fw fa-sign-out-alt mr-1"></i>
-                {{ __('adminlte::adminlte.log_out') }}
+    <ul id="nhcUserMenu" style="
+        display: none;
+        position: fixed;
+        top: 57px;
+        right: 16px;
+        z-index: 99999;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        min-width: 200px;
+        padding: 4px 0;
+        list-style: none;
+        margin: 0;
+    ">
+        <li>
+            <a href="{{ route('profile.edit') }}" style="display:block; padding:10px 16px; color:#444; text-decoration:none;">
+                <i class="fas fa-cog mr-2"></i> Profile Settings
             </a>
-
-            <form id="logout-form" action="{{ $logout_url }}" method="POST" style="display: none;">
-                @if(config('adminlte.logout_method'))
-                    {{ method_field(config('adminlte.logout_method')) }}
-                @endif
-                {{ csrf_field() }}
-            </form>
         </li>
-
+        <li style="border-top:1px solid #eee;"></li>
+        <li>
+            <a href="#" onclick="event.preventDefault(); document.getElementById('nhc-logout-form').submit();"
+               style="display:block; padding:10px 16px; color:#e53935; text-decoration:none;">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </a>
+        </li>
     </ul>
 
+    <form id="nhc-logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
+        @csrf
+    </form>
+
 </li>
+
+<script>
+function nhcToggleMenu(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var m = document.getElementById('nhcUserMenu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', function(e) {
+    var btn = document.getElementById('nhcUserBtn');
+    var m = document.getElementById('nhcUserMenu');
+    if (m && btn && !btn.contains(e.target)) m.style.display = 'none';
+});
+</script>

@@ -10,11 +10,14 @@ class EmployeeController extends Controller
     /**
      * Display a listing of all employees
      */
-    public function index()
+    public function index(Request $request)
     {
         $employees = Employee::with('salaryHistories')
+            ->when($request->filled('q'), fn ($q) => $q->where(fn ($i) => $i->where('name', 'like', '%'.$request->q.'%')->orWhere('employee_code', 'like', '%'.$request->q.'%')))
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->orderBy('name')
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('employees.index', compact('employees'));
     }

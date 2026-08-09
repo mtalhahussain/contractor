@@ -33,6 +33,29 @@
         </div>
     @endif
 
+    <form method="GET" class="card card-body mb-3 p-3">
+        <div class="form-row align-items-end">
+            <div class="col-md-5">
+                <label class="mb-1 small font-weight-bold">Search</label>
+                <input type="text" name="q" class="form-control form-control-sm" value="{{ request('q') }}" placeholder="Name or employee code">
+            </div>
+            <div class="col-md-4">
+                <label class="mb-1 small font-weight-bold">Status</label>
+                <select name="status" class="form-control form-control-sm">
+                    <option value="">All Statuses</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-primary btn-sm btn-block">Filter</button>
+                @if(request()->anyFilled(['q','status']))
+                    <a href="{{ route('employees.index') }}" class="btn btn-secondary btn-sm btn-block mt-1">Clear</a>
+                @endif
+            </div>
+        </div>
+    </form>
+
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Employee List</h3>
@@ -125,7 +148,7 @@
         $(document).ready(function() {
             $('#employeesTable').DataTable({
                 "paging": false,
-                "searching": true,
+                "searching": false,
                 "ordering": true,
             });
         });

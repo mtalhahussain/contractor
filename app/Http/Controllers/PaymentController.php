@@ -20,11 +20,18 @@ class PaymentController extends Controller
         'other',
     ];
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $payments = Payment::query()->with('machine')->latest('date')->paginate(30);
+        $machines = Machine::query()->orderBy('name')->get(['id', 'name']);
+        $payments = Payment::query()->with('machine')
+            ->when($request->filled('machine_id'), fn ($q) => $q->where('machine_id', $request->machine_id))
+            ->when($request->filled('month') && preg_match('/^\d{4}-\d{2}$/', (string) $request->month), function ($q) use ($request) {
+                [$y, $m] = explode('-', $request->month);
+                $q->whereYear('date', $y)->whereMonth('date', $m);
+            })
+            ->latest('date')->paginate(30)->withQueryString();
 
-        return view('payments.index', compact('payments'));
+        return view('payments.index', compact('payments', 'machines'));
     }
 
     public function create(): View

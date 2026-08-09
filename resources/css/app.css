@@ -2,20 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-/* AdminLTE Sidebar Toggle & Overlap Fix */
+/* AdminLTE Sidebar Toggle with Mini Icon Mode - Enhanced */
 
 /* Main sidebar container */
 .main-sidebar,
 .sidebar {
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    max-width: 280px;
+    width: 280px !important;
     position: fixed !important;
     top: 0;
     left: 0;
     height: 100vh !important;
     z-index: 800;
-    transition: transform 0.3s ease, left 0.3s ease !important;
+    transition: width 0.3s ease !important;
 }
 
 /* Sidebar nav containers */
@@ -78,6 +78,7 @@
 .layout-fixed .wrapper {
     overflow-x: hidden !important;
     transition: margin-left 0.3s ease !important;
+    margin-left: 280px;
 }
 
 /* Content wrapper */
@@ -88,25 +89,143 @@
 
 /* Main header transitions */
 .main-header {
-    transition: margin-left 0.3s ease !important;
+    transition: margin-left 0.3s ease, width 0.3s ease !important;
+    margin-left: 280px;
+    width: calc(100% - 280px) !important;
 }
 
-/* Sidebar visible state */
-body.sidebar-open .wrapper,
-body.sidebar-open .main-header,
-body.sidebar-open .content-wrapper {
-    margin-left: 280px !important;
+/* Navbar nav scrollbar fix and transitions */
+.main-header .navbar-nav,
+.navbar-nav {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
 }
 
-/* Sidebar collapsed state */
+.main-header .navbar-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.main-header .navbar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.main-header .navbar-nav::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.main-header .navbar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* COLLAPSED STATE - Mini Sidebar (icons only) */
 body.sidebar-collapse .main-sidebar {
-    transform: translateX(-280px) !important;
+    width: 80px !important;
 }
 
 body.sidebar-collapse .wrapper,
-body.sidebar-collapse .main-header,
-body.sidebar-collapse .content-wrapper {
+body.sidebar-collapse .main-header {
+    margin-left: 80px !important;
+    width: calc(100% - 80px) !important;
+}
+
+body.sidebar-collapse .navbar-nav {
     margin-left: 0 !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Hover expand entire sidebar on hover */
+body.sidebar-collapse .main-sidebar:hover {
+    width: 280px !important;
+}
+
+body.sidebar-collapse .main-sidebar:hover + .main-header,
+body.sidebar-collapse:hover .main-header {
+    margin-left: 280px !important;
+    width: calc(100% - 280px) !important;
+}
+
+body.sidebar-collapse .main-sidebar:hover + .main-header .navbar-nav {
+    transition: all 0.3s ease !important;
+}
+
+body.sidebar-collapse .nav-link span:not(.badge),
+body.sidebar-collapse .nav-header,
+body.sidebar-collapse .brand-text {
+    display: none !important;
+}
+
+body.sidebar-collapse .nav-link {
+    padding: 0.75rem 0.5rem !important;
+    justify-content: center !important;
+    position: relative;
+}
+
+body.sidebar-collapse .nav-link i {
+    margin-right: 0 !important;
+    font-size: 1.5rem;
+}
+
+/* Hover expand entire sidebar on hover */
+body.sidebar-collapse .main-sidebar:hover {
+    width: 280px !important;
+}
+
+body.sidebar-collapse .main-sidebar:hover .brand-link {
+    width: 280px !important;
+    padding: 10px 14px !important;
+    min-height: 70px;
+    transition: width 0.3s ease, padding 0.3s ease !important;
+}
+
+body.sidebar-collapse .main-sidebar:hover .brand-image.brand-logo-img,
+body.sidebar-collapse .main-sidebar:hover .brand-image {
+    width: 120px !important;
+    height: 42px !important;
+    transition: width 0.3s ease, height 0.3s ease !important;
+}
+
+body.sidebar-collapse .main-sidebar:hover .nav-link span:not(.badge),
+body.sidebar-collapse .main-sidebar:hover .nav-header,
+body.sidebar-collapse .main-sidebar:hover .brand-text {
+    display: block !important;
+}
+
+body.sidebar-collapse .main-sidebar:hover .nav-link {
+    padding: 0.75rem 1rem !important;
+    justify-content: flex-start !important;
+}
+
+body.sidebar-collapse .main-sidebar:hover .nav-link i {
+    margin-right: 8px !important;
+}
+
+body.sidebar-collapse .main-sidebar:hover .nav-sidebar > .nav-item {
+    margin: 4px 10px !important;
+}
+
+/* OPEN STATE - Full Sidebar */
+body.sidebar-open .main-sidebar {
+    width: 280px !important;
+}
+
+body.sidebar-open .wrapper,
+body.sidebar-open .main-header {
+    margin-left: 280px !important;
+}
+
+body.sidebar-open .nav-link span,
+body.sidebar-open .nav-header,
+body.sidebar-open .brand-text {
+    display: block !important;
+}
+
+body.sidebar-open .nav-link {
+    padding: 0.75rem 1rem !important;
+}
+
+body.sidebar-open .nav-link i {
+    margin-right: 8px !important;
 }
 
 /* Desktop only - ensure sidebar doesn't overflow on large screens */
@@ -143,4 +262,83 @@ body.sidebar-collapse .content-wrapper {
     .content-wrapper {
         margin-left: 0 !important;
     }
+}
+
+/* Navbar container - allow dropdown to overflow */
+.main-header.navbar {
+    overflow: visible !important;
+    position: relative;
+    z-index: 1000;
+}
+
+.navbar-nav {
+    overflow: visible !important;
+}
+
+.nav-item.dropdown {
+    position: relative;
+    overflow: visible !important;
+}
+
+/* Navbar dropdown menu - ensure visibility above sidebar */
+.navbar-nav .dropdown-menu,
+.dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: auto !important;
+    right: 0 !important;
+    z-index: 1050 !important;
+    display: none;
+    min-width: 220px;
+    padding: 0.5rem 0;
+    margin: 0.125rem 0 0;
+    font-size: 0.875rem;
+    list-style: none;
+    background-color: #fff;
+    border: 1px solid #dbdae3;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: visible !important;
+}
+
+.navbar-nav .show > .dropdown-menu,
+.navbar-nav .dropdown-menu.show {
+    display: block !important;
+}
+
+/* Dropdown list items */
+.dropdown-menu li {
+    list-style: none;
+    display: block;
+    width: 100%;
+}
+
+.dropdown-menu li a,
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    clear: both;
+    color: #5d596c;
+    text-align: left;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dropdown-menu li a:hover,
+.dropdown-item:hover,
+.dropdown-item:focus {
+    color: #2f80ed;
+    background-color: #f8f7fa;
+}
+
+.dropdown-divider {
+    height: 0;
+    margin: 0.5rem 0;
+    overflow: hidden;
+    border-top: 1px solid #dbdae3;
 }

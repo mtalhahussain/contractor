@@ -15,15 +15,19 @@ class FuelStockMovementController extends Controller
     {
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        $stocks = FuelStock::query()->orderBy('name')->get(['id', 'name']);
         $movements = FuelStockMovement::query()
             ->with(['fuelStock', 'machine', 'issue'])
-            ->latest('date')
-            ->latest('id')
-            ->paginate(30);
+            ->when($request->filled('fuel_stock_id'), fn ($q) => $q->where('fuel_stock_id', $request->fuel_stock_id))
+            ->when($request->filled('month') && preg_match('/^\d{4}-\d{2}$/', (string) $request->month), function ($q) use ($request) {
+                [$y, $m] = explode('-', $request->month);
+                $q->whereYear('date', $y)->whereMonth('date', $m);
+            })
+            ->latest('date')->latest('id')->paginate(30)->withQueryString();
 
-        return view('fuel-stock-movements.index', compact('movements'));
+        return view('fuel-stock-movements.index', compact('movements', 'stocks'));
     }
 
     public function create(): View

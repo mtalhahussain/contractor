@@ -9,6 +9,29 @@
 @section('content')
     @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
     @if (session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
+    <form method="GET" class="card card-body mb-3 p-3">
+        <div class="form-row align-items-end">
+            <div class="col-md-5">
+                <label class="mb-1 small font-weight-bold">Tank / Store</label>
+                <select name="fuel_stock_id" class="form-control form-control-sm">
+                    <option value="">All Tanks</option>
+                    @foreach($stocks as $s)
+                        <option value="{{ $s->id }}" {{ request('fuel_stock_id') == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="mb-1 small font-weight-bold">Month</label>
+                <input type="month" name="month" class="form-control form-control-sm" value="{{ request('month') }}">
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-primary btn-sm btn-block">Filter</button>
+                @if(request()->anyFilled(['fuel_stock_id','month']))
+                    <a href="{{ route('fuel-stock-movements.index') }}" class="btn btn-secondary btn-sm btn-block mt-1">Clear</a>
+                @endif
+            </div>
+        </div>
+    </form>
     <div class="alert alert-info">
         <strong>Tip:</strong> Use this screen for fuel refill/manual adjustments. For daily consumption issue, use <em>Fuel Issues</em> so stock is deducted automatically.
     </div>

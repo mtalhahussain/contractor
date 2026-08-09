@@ -21,11 +21,19 @@ class ExpenseController extends Controller
         'Miscellaneous',
     ];
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $expenses = Expense::query()->with('machine')->latest('date')->paginate(30);
+        $machines = Machine::query()->orderBy('name')->get(['id', 'name']);
+        $expenses = Expense::query()->with('machine')
+            ->when($request->filled('machine_id'), fn ($q) => $q->where('machine_id', $request->machine_id))
+            ->when($request->filled('expense_type'), fn ($q) => $q->where('expense_type', $request->expense_type))
+            ->when($request->filled('month') && preg_match('/^\d{4}-\d{2}$/', (string) $request->month), function ($q) use ($request) {
+                [$y, $m] = explode('-', $request->month);
+                $q->whereYear('date', $y)->whereMonth('date', $m);
+            })
+            ->latest('date')->paginate(30)->withQueryString();
 
-        return view('expenses.index', compact('expenses'));
+        return view('expenses.index', compact('expenses', 'machines'));
     }
 
     public function create(): View
