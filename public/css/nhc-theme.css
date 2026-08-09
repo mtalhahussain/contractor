@@ -452,30 +452,14 @@ h6 {
         width: calc(100% - 280px) !important;
     }
 
-    /* Navbar nav scrollbar and transitions */
+    /* Navbar nav transitions */
     .main-header .navbar-nav,
     .navbar-nav {
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
+        overflow: visible !important;
         transition: all 0.3s ease !important;
     }
 
-    .main-header .navbar-nav::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .main-header .navbar-nav::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .main-header .navbar-nav::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 3px;
-    }
-
-    .main-header .navbar-nav::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.4);
-    }
+    .main-header .navbar-nav::-webkit-scrollbar { width: 0; }
 
     .content-wrapper {
         margin-left: 0 !important;
@@ -527,13 +511,12 @@ h6 {
     }
 
     body.sidebar-collapse .main-sidebar:hover + .main-header,
-    body.sidebar-collapse:hover .main-header {
+    body.sidebar-hovered .main-header {
         margin-left: 280px !important;
         width: calc(100% - 280px) !important;
     }
 
-    body.sidebar-collapse .main-sidebar:hover + .main-header .navbar-nav,
-    body.sidebar-collapse:hover .navbar-nav {
+    body.sidebar-hovered .main-header .navbar-nav {
         transition: all 0.3s ease !important;
     }
 

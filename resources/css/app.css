@@ -94,29 +94,14 @@
     width: calc(100% - 280px) !important;
 }
 
-/* Navbar nav scrollbar fix and transitions */
+/* Navbar nav transitions */
 .main-header .navbar-nav,
 .navbar-nav {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+    overflow: visible !important;
+    transition: all 0.3s ease !important;
 }
 
-.main-header .navbar-nav::-webkit-scrollbar {
-    width: 6px;
-}
-
-.main-header .navbar-nav::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.main-header .navbar-nav::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 3px;
-}
-
-.main-header .navbar-nav::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.4);
-}
+/* Remove scrollbar rules that caused visible bar in topnav */
 
 /* COLLAPSED STATE - Mini Sidebar (icons only) */
 body.sidebar-collapse .main-sidebar {
@@ -140,12 +125,12 @@ body.sidebar-collapse .main-sidebar:hover {
 }
 
 body.sidebar-collapse .main-sidebar:hover + .main-header,
-body.sidebar-collapse:hover .main-header {
+body.sidebar-hovered .main-header {
     margin-left: 280px !important;
     width: calc(100% - 280px) !important;
 }
 
-body.sidebar-collapse .main-sidebar:hover + .main-header .navbar-nav {
+body.sidebar-hovered .main-sidebar:hover + .main-header .navbar-nav {
     transition: all 0.3s ease !important;
 }
 
