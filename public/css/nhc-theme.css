@@ -396,12 +396,18 @@ h6 {
     }
 }
 
-/* Desktop Mode - Sidebar Horizontal Scroll Fix */
+/* Desktop Mode - Sidebar Toggle & Overlap Fix */
 @media (min-width: 993px) {
     .main-sidebar {
         width: 280px !important;
         overflow-x: hidden !important;
         overflow-y: auto !important;
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        height: 100vh !important;
+        z-index: 800 !important;
+        transition: transform 0.3s ease, left 0.3s ease !important;
     }
 
     .main-sidebar .nav-sidebar {
@@ -430,6 +436,44 @@ h6 {
 
     .nav-item {
         overflow-x: hidden !important;
+    }
+
+    /* Layout containers - main positioning */
+    .layout-fixed .wrapper,
+    .wrapper {
+        margin-left: 280px !important;
+        transition: margin-left 0.3s ease !important;
+    }
+
+    .main-header {
+        margin-left: 280px !important;
+        transition: margin-left 0.3s ease !important;
+    }
+
+    .content-wrapper {
+        margin-left: 0 !important;
+        transition: margin-left 0.3s ease !important;
+    }
+
+    /* Sidebar open/visible state */
+    body.sidebar-open .wrapper,
+    body.sidebar-open .main-header {
+        margin-left: 280px !important;
+    }
+
+    body.sidebar-open .main-sidebar {
+        transform: translateX(0) !important;
+        left: 0 !important;
+    }
+
+    /* Sidebar collapse state - slide out */
+    body.sidebar-collapse .main-sidebar {
+        transform: translateX(-280px) !important;
+    }
+
+    body.sidebar-collapse .wrapper,
+    body.sidebar-collapse .main-header {
+        margin-left: 0 !important;
     }
 }
 
