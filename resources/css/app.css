@@ -2,40 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
-/* AdminLTE Sidebar Horizontal Scroll Fix */
+/* AdminLTE Sidebar Horizontal Scroll Fix - Desktop Mode */
+
+/* Main sidebar container */
+.main-sidebar,
 .sidebar {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    max-width: 280px;
+}
+
+/* Sidebar nav containers */
+.sidebar-nav,
+.nav-sidebar,
+.nav-treeview {
     overflow-x: hidden !important;
     overflow-y: auto !important;
 }
 
-.sidebar-nav,
-.nav-sidebar {
+/* Menu links - force text wrap */
+.main-sidebar .nav-sidebar .nav-item .nav-link,
+.nav-link,
+.sidebar-menu li > a,
+.sidebar-menu .nav-link {
+    white-space: normal !important;
+    word-break: break-word !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-right: 10px !important;
+}
+
+/* Menu link text - enable wrapping */
+.main-sidebar .nav-sidebar .nav-item .nav-link span,
+.nav-link span,
+.sidebar-menu li a span,
+.sidebar-menu .nav-link span {
+    display: block !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+}
+
+/* Remove forced nowrap from nav items */
+.nav-item {
     overflow-x: hidden !important;
 }
 
-.sidebar-menu li > a,
-.nav-link {
-    word-break: break-word;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: normal !important;
-    padding-right: 0.5rem;
+/* Badge/icon styling - prevent stretching */
+.nav-link .badge,
+.nav-link .right,
+.nav-link i {
+    flex-shrink: 0 !important;
 }
 
-.sidebar-menu li a > span,
-.nav-link span {
-    display: block;
-    word-break: break-word;
-    overflow-wrap: break-word;
+/* Icon spacing */
+.nav-link i {
+    margin-right: 8px !important;
 }
 
-/* Remove forced nowrap from AdminLTE */
-.sidebar-menu li a .right,
-.nav-link .right {
-    white-space: normal;
-}
-
-/* Control Sidebar horizontal scroll fix */
+/* Control sidebar horizontal scroll fix */
 .control-sidebar {
     overflow-x: hidden !important;
+}
+
+/* Wrapper container - prevent page horizontal scroll */
+.wrapper,
+.layout-fixed .wrapper {
+    overflow-x: hidden !important;
+}
+
+/* Content wrapper */
+.content-wrapper {
+    overflow-x: auto !important;
+}
+
+/* Desktop only - ensure sidebar doesn't overflow on large screens */
+@media (min-width: 992px) {
+    .main-sidebar {
+        width: 280px !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+    
+    .main-sidebar .nav-sidebar {
+        width: 100% !important;
+        overflow-x: hidden !important;
+    }
+    
+    .nav-link {
+        white-space: normal !important;
+        min-height: auto !important;
+        padding: 0.75rem 1rem !important;
+    }
 }

@@ -395,3 +395,46 @@ h6 {
         height: 36px !important;
     }
 }
+
+/* Desktop Mode - Sidebar Horizontal Scroll Fix */
+@media (min-width: 993px) {
+    .main-sidebar {
+        width: 280px !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    .main-sidebar .nav-sidebar {
+        width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    .main-sidebar .nav-sidebar > .nav-item > .nav-link,
+    .main-sidebar .nav-treeview > .nav-item > .nav-link {
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        word-wrap: break-word !important;
+        display: flex !important;
+        align-items: center !important;
+        padding-right: 10px !important;
+        min-height: auto !important;
+    }
+
+    .main-sidebar .nav-sidebar .nav-item .nav-link span,
+    .main-sidebar .nav-treeview .nav-item .nav-link span {
+        display: block !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+
+    .nav-item {
+        overflow-x: hidden !important;
+    }
+}
+
+/* Global wrapper overflow fix */
+.wrapper,
+.layout-fixed .wrapper {
+    overflow-x: hidden !important;
+}
