@@ -1,3 +1,41 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* AdminLTE Sidebar Horizontal Scroll Fix */
+.sidebar {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+.sidebar-nav,
+.nav-sidebar {
+    overflow-x: hidden !important;
+}
+
+.sidebar-menu li > a,
+.nav-link {
+    word-break: break-word;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal !important;
+    padding-right: 0.5rem;
+}
+
+.sidebar-menu li a > span,
+.nav-link span {
+    display: block;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Remove forced nowrap from AdminLTE */
+.sidebar-menu li a .right,
+.nav-link .right {
+    white-space: normal;
+}
+
+/* Control Sidebar horizontal scroll fix */
+.control-sidebar {
+    overflow-x: hidden !important;
+}
